@@ -1,0 +1,33 @@
+# Python environments and caches
+/.venv/
+__pycache__/
+*.py[cod]
+/.pytest_cache/
+/.ruff_cache/
+/.ty_cache/
+/.coverage
+/htmlcov/
+
+# Build artifacts
+/build/
+/dist/
+*.egg-info/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.log
+/.mise.local.toml
+
+# Local assistant/runtime metadata
+/AGENTS.local.md
+/CLAUDE.local.md
+/.agents/
+/.codex/*
+!/.codex/skills/
+!/.codex/skills/**
+/.claude/*
+!/.claude/skills/
+!/.claude/skills/**
+/.playwright-mcp/

@@ -1,0 +1,41 @@
+[build-system]
+requires = ["uv_build>=0.11,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "scene-analyzer"
+version = "0.1.0"
+description = "Tools for analyzing scenes."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4,<3.0",
+    "pillow>=12.0,<13.0",
+    "pydantic>=2.12,<3.0",
+    "pyyaml>=6.0,<7.0",
+    "rawpy>=0.27,<0.28",
+    "rich>=14.0,<15.0",
+    "typer>=0.21,<1.0",
+]
+
+[project.scripts]
+scene-analyzer = "scene_analyzer.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0,<10.0",
+    "ruff>=0.15,<0.16",
+    "ty>=0.0.61,<0.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "T10", "RUF"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
+testpaths = ["tests"]

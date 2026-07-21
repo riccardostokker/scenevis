@@ -1,0 +1,25 @@
+version: 1
+scene_id: corridor_01
+
+regions:
+  target:
+    type: rectangle
+    x: 0.31
+    y: 0.42
+    width: 0.08
+    height: 0.16
+
+  local_background:
+    type: polygon
+    points:
+      - [0.27, 0.38]
+      - [0.43, 0.38]
+      - [0.43, 0.62]
+      - [0.27, 0.62]
+
+  bright_background:
+    type: rectangle
+    x: 0.58
+    y: 0.12
+    width: 0.34
+    height: 0.68

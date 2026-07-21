@@ -1,0 +1,90 @@
+[tools]
+python = "3.14.6"
+uv = "0.11.29"
+prek = "0.4.10"
+git-cliff = "2.13.1"
+
+[settings]
+python.uv_venv_auto = true
+
+[env]
+UV_PROJECT_ENVIRONMENT = ".venv"
+UV_PYTHON = "3.14.6"
+
+[tasks.sync]
+description = "Install or refresh the locked development environment."
+run = "uv sync --locked"
+
+[tasks.install]
+description = "Alias for sync."
+depends = ["sync"]
+
+[tasks.format]
+description = "Check formatting without rewriting files."
+run = "uv run --no-sync ruff format --check src tests scripts"
+
+[tasks."format:fix"]
+description = "Rewrite Python formatting."
+run = "uv run --no-sync ruff format src tests scripts"
+
+[tasks.lint]
+description = "Run Ruff lint checks."
+run = "uv run --no-sync ruff check src tests scripts"
+
+[tasks."lint:fix"]
+description = "Apply Ruff fixes and then format changes."
+run = [
+    "uv run --no-sync ruff check --fix src tests scripts",
+    "mise run format:fix",
+]
+
+[tasks.typecheck]
+description = "Run static type checks with ty."
+run = "uv run --no-sync ty check src tests scripts"
+
+[tasks.test]
+description = "Run Python tests."
+run = "uv run --no-sync pytest"
+
+[tasks.check]
+description = "Run the fast read-only validation aggregate."
+depends = ["version:check", "format", "lint", "typecheck"]
+
+[tasks.hooks]
+description = "Run all prek hooks on all files."
+run = "prek run --all-files"
+
+[tasks."hooks:install"]
+description = "Install and prepare repository Git hooks."
+run = "prek install --prepare-hooks"
+
+[tasks."hooks:run"]
+description = "Run all prek hooks on all files."
+depends = ["hooks"]
+
+[tasks.version]
+description = "Print the effective package version for the current Git state."
+run = "uv run --no-sync python scripts/version.py --field version"
+
+[tasks."version:check"]
+description = "Verify committed version metadata and the lockfile without rewriting files."
+run = [
+    "uv run --no-sync python scripts/check_version.py",
+    "uv lock --check",
+]
+
+[tasks."version:sync"]
+description = "Update version metadata and the lockfile without committing."
+run = "uv run --no-sync python scripts/stamp_version.py"
+
+[tasks."version:release"]
+description = "Prepare a release commit and local tag without pushing."
+run = "uv run --no-sync python scripts/version_workflow.py release"
+
+[tasks."changelog:preview"]
+description = "Preview the unreleased Conventional Commit changelog."
+run = "git-cliff --unreleased --strip all"
+
+[tasks."python:release"]
+description = "Build wheel and source distribution artifacts."
+run = "uv build"
