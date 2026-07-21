@@ -1,7 +1,11 @@
 # Scenevis
 
-[![CI](https://github.com/riccardostokker/scenevis/actions/workflows/ci.yml/badge.svg)](https://github.com/riccardostokker/scenevis/actions/workflows/ci.yml)
-[![Security](https://github.com/riccardostokker/scenevis/actions/workflows/security.yml/badge.svg)](https://github.com/riccardostokker/scenevis/actions/workflows/security.yml)
+[![pipeline status](https://gitlab.com/riccardofagiolo17/scenevis/badges/main/pipeline.svg)](https://gitlab.com/riccardofagiolo17/scenevis/-/pipelines)
+
+> [!IMPORTANT]
+> [GitLab](https://gitlab.com/riccardofagiolo17/scenevis) is the canonical home for Scenevis.
+> The [GitHub repository](https://github.com/riccardostokker/scenevis) is a read-only mirror.
+> Please open issues and merge requests on GitLab.
 
 Scenevis measures how clearly a selected target separates from its photographic surroundings. It
 combines an interactive React workspace with a typed Python analysis engine for RAW and raster
@@ -41,7 +45,7 @@ compare the resulting measurements. No YAML sidecars or project files are requir
 pinned Python, uv, Node.js, pnpm, prek, and git-cliff toolchain:
 
 ```sh
-git clone git@github.com:riccardostokker/scenevis.git
+git clone git@gitlab.com:riccardofagiolo17/scenevis.git
 cd scenevis
 mise install
 mise run sync
@@ -187,7 +191,7 @@ The main tasks are:
 
 | Command | Purpose |
 | --- | --- |
-| `mise run check` | Formatting, linting, types, lockfiles, Actions syntax, versions, and API-contract drift |
+| `mise run check` | Formatting, linting, types, lockfiles, versions, and API-contract drift |
 | `mise run test` | Python unit and API integration tests |
 | `mise run test:gui` | React unit and component tests |
 | `mise run test:gui:e2e` | Curated two-image browser and report-export journey |
@@ -199,6 +203,15 @@ The main tasks are:
 The normal Python suite excludes the slower original-camera lane. Fixture provenance, dimensions,
 byte sizes, and SHA-256 hashes live in `tests/fixtures/canon_eos_200d/manifest.json`.
 
-GitHub Actions run the fast checks and tests on every pull request, exercise the complete browser
-workflow, audit dependencies and repository history, and build GitHub release artifacts from
-`vX.Y.Z` tags.
+GitLab CI runs the fast checks and tests on every branch and merge request, exercises the complete
+browser workflow, audits dependencies and repository history, and publishes GitLab release
+artifacts from `vX.Y.Z` tags.
+
+## License
+
+Scenevis is free and open-source software, dual-licensed under either of:
+
+- [Apache License, Version 2.0](LICENSE-APACHE)
+- [MIT License](LICENSE-MIT)
+
+You may choose either license when using, modifying, or distributing the project.

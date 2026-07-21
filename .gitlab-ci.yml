@@ -1,0 +1,131 @@
+stages:
+  - check
+  - build
+  - test
+  - publish
+  - notify
+
+variables:
+  GIT_DEPTH: "0"
+  MISE_INSTALL_PATH: /usr/local/bin/mise
+  MISE_YES: "1"
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
+
+cache:
+  key:
+    files:
+      - app/pnpm-lock.yaml
+      - uv.lock
+  paths:
+    - .pnpm-store/
+    - .uv-cache/
+
+.source-rules:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+.mise-job:
+  image: ubuntu:24.04
+  interruptible: true
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq ca-certificates curl git libatomic1 >/dev/null
+    - curl -fsSL https://mise.run | sh
+    - mise trust ./mise.toml
+    - mise install
+    - eval "$(mise env -s bash)"
+    - pnpm config set store-dir .pnpm-store
+    - mise run sync
+
+check:
+  stage: check
+  extends:
+    - .mise-job
+    - .source-rules
+  script:
+    - mise run check
+
+audit:
+  stage: check
+  extends:
+    - .mise-job
+    - .source-rules
+  script:
+    - mise run audit
+
+python:release:
+  stage: build
+  extends: .mise-job
+  needs:
+    - check
+    - audit
+  script:
+    - mise run python:release
+  artifacts:
+    paths:
+      - dist/*.tar.gz
+      - dist/*.whl
+    expire_in: 1 week
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+
+test:
+  stage: test
+  extends:
+    - .mise-job
+    - .source-rules
+  script:
+    - mise run test
+
+test:gui:
+  stage: test
+  extends:
+    - .mise-job
+    - .source-rules
+  script:
+    - mise run test:gui
+
+test:fixtures:
+  stage: test
+  extends: .mise-job
+  script:
+    - mise run test:fixtures
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+
+test:gui:e2e:
+  stage: test
+  extends:
+    - .mise-job
+    - .source-rules
+  script:
+    - mise run browser:install
+    - mise run test:gui:e2e
+
+release:
+  stage: publish
+  image: registry.gitlab.com/gitlab-org/cli:latest
+  needs:
+    - job: python:release
+      artifacts: true
+    - job: test
+      artifacts: false
+    - job: test:gui
+      artifacts: false
+    - job: test:fixtures
+      artifacts: false
+    - job: test:gui:e2e
+      artifacts: false
+  script:
+    - >-
+      GLAB_ENABLE_CI_AUTOLOGIN=true glab release create "$CI_COMMIT_TAG"
+      dist/*.whl dist/*.tar.gz
+      --name "Scenevis $CI_COMMIT_TAG"
+      --notes "See CHANGELOG.md for the complete release history."
+      --ref "$CI_COMMIT_SHA"
+      --use-package-registry
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/

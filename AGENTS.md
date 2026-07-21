@@ -12,4 +12,6 @@
   tasks for mutations.
 - Derive frontend API types from the FastAPI OpenAPI contract with `mise run contract:sync`.
 - Use typed public APIs, Conventional Commits, and git-cliff for release notes and versions.
+- Treat GitLab as the canonical repository, issue tracker, merge-request surface, CI system, and
+  release host. GitHub is a read-only push mirror; never land changes there directly.
 - Never commit `.agents/` or local assistant/runtime state.

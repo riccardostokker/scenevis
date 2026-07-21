@@ -7,6 +7,8 @@ name = "scenevis"
 version = "0.1.0"
 description = "Interactive target-visibility analysis for photographic scenes."
 readme = "README.md"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.116,<1.0",
@@ -20,6 +22,12 @@ dependencies = [
 
 [project.scripts]
 scenevis = "scenevis.cli:main"
+
+[project.urls]
+Homepage = "https://gitlab.com/riccardofagiolo17/scenevis"
+Repository = "https://gitlab.com/riccardofagiolo17/scenevis"
+Issues = "https://gitlab.com/riccardofagiolo17/scenevis/-/issues"
+Mirror = "https://github.com/riccardostokker/scenevis"
 
 [dependency-groups]
 dev = [

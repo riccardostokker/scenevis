@@ -10,3 +10,4 @@ Follow the repository guidance in `AGENTS.md`.
 - Generate frontend API types from FastAPI with `mise run contract:sync`; never hand-copy the
   wire contract.
 - Use Conventional Commits; git-cliff owns changelog and version calculation.
+- Develop, review, run CI, and publish releases on GitLab. GitHub is a read-only discovery mirror.
