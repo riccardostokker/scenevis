@@ -32,6 +32,11 @@ export const REGION_COLORS: Record<RegionName, string> = {
   bright_background: "#d07782",
 };
 
+export const REGION_STROKES = {
+  resting: { halo: 3, outline: 1.6, fillAlpha: "0d" },
+  active: { halo: 4, outline: 2.4, fillAlpha: "18" },
+} as const;
+
 export const DRAWING_MODES: DrawingMode[] = ["select", "box", "lasso"];
 
 export const DRAWING_MODE_LABELS: Record<DrawingMode, string> = {

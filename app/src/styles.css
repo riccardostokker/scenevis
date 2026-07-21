@@ -642,8 +642,20 @@ p {
 }
 
 .draft-region {
-  stroke-width: 0.008;
-  stroke-dasharray: 0.012 0.008;
+  pointer-events: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.draft-region.halo {
+  stroke-width: 4;
+  stroke-opacity: 0.78;
+  stroke-dasharray: 8 5;
+}
+
+.draft-region.outline {
+  stroke-width: 2.4;
+  stroke-dasharray: 8 5;
 }
 
 .selection-toolbar {

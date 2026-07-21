@@ -19,9 +19,15 @@ describe("scene canvas", () => {
     );
 
     const canvas = screen.getByLabelText("Box Target");
-    const coloredOutline = canvas.querySelector('rect[stroke="#e3a43f"]');
+    const coloredOutline = canvas.querySelector('rect[data-layer="outline"]');
+    const halo = canvas.querySelector('rect[data-layer="halo"]');
     expect(canvas.querySelector("text")).toBeNull();
-    expect(coloredOutline).toHaveAttribute("stroke-width", "0.007");
-    expect(coloredOutline).not.toHaveAttribute("vector-effect");
+    expect(coloredOutline).toHaveAttribute("stroke", "#e3a43f");
+    expect(coloredOutline).toHaveAttribute("stroke-width", "2.4");
+    expect(coloredOutline).toHaveAttribute("stroke-linejoin", "round");
+    expect(coloredOutline).toHaveAttribute("vector-effect", "non-scaling-stroke");
+    expect(halo).toHaveAttribute("stroke", "#0d0c0a");
+    expect(halo).toHaveAttribute("stroke-opacity", "0.78");
+    expect(halo).toHaveAttribute("stroke-width", "4");
   });
 });

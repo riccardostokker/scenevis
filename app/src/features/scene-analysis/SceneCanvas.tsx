@@ -6,6 +6,7 @@ import {
   REGION_COLORS,
   REGION_LABELS,
   REGION_NAMES,
+  REGION_STROKES,
   type DrawingMode,
   type Point,
   type Region,
@@ -105,25 +106,8 @@ export function SceneCanvas({
           );
         })}
 
-        {draftBox && (
-          <rect
-            x={draftBox.x}
-            y={draftBox.y}
-            width={draftBox.width}
-            height={draftBox.height}
-            className="draft-region"
-            fill={`${REGION_COLORS[active]}28`}
-            stroke={REGION_COLORS[active]}
-          />
-        )}
-        {draftLasso.length > 1 && (
-          <polyline
-            points={points(draftLasso)}
-            className="draft-region"
-            fill={`${REGION_COLORS[active]}28`}
-            stroke={REGION_COLORS[active]}
-          />
-        )}
+        {draftBox && <DraftBox region={draftBox} color={REGION_COLORS[active]} />}
+        {draftLasso.length > 1 && <DraftLasso value={draftLasso} color={REGION_COLORS[active]} />}
       </svg>
       {toolbar}
     </div>
@@ -140,14 +124,23 @@ export function RegionShape({
   active: boolean;
 }) {
   const color = REGION_COLORS[name];
+  const treatment = active ? REGION_STROKES.active : REGION_STROKES.resting;
   return (
     <>
-      <Geometry region={region} fill="none" stroke="#171511" strokeWidth={active ? 0.012 : 0.009} />
       <Geometry
         region={region}
-        fill={`${color}28`}
+        fill="none"
+        stroke="#0d0c0a"
+        strokeOpacity={0.78}
+        strokeWidth={treatment.halo}
+        dataLayer="halo"
+      />
+      <Geometry
+        region={region}
+        fill={`${color}${treatment.fillAlpha}`}
         stroke={color}
-        strokeWidth={active ? 0.007 : 0.005}
+        strokeWidth={treatment.outline}
+        dataLayer="outline"
       />
     </>
   );
@@ -157,12 +150,16 @@ function Geometry({
   region,
   fill,
   stroke,
+  strokeOpacity,
   strokeWidth,
+  dataLayer,
 }: {
   region: Region;
   fill: string;
   stroke: string;
+  strokeOpacity?: number;
   strokeWidth: number;
+  dataLayer: "halo" | "outline";
 }) {
   if (region.type === "polygon") {
     return (
@@ -170,7 +167,12 @@ function Geometry({
         points={points(region.points)}
         fill={fill}
         stroke={stroke}
+        strokeOpacity={strokeOpacity}
         strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        data-layer={dataLayer}
       />
     );
   }
@@ -182,8 +184,60 @@ function Geometry({
       height={region.height}
       fill={fill}
       stroke={stroke}
+      strokeOpacity={strokeOpacity}
       strokeWidth={strokeWidth}
+      strokeLinejoin="round"
+      vectorEffect="non-scaling-stroke"
+      data-layer={dataLayer}
     />
+  );
+}
+
+function DraftBox({ region, color }: { region: Region & { type: "rectangle" }; color: string }) {
+  return (
+    <>
+      <rect
+        x={region.x}
+        y={region.y}
+        width={region.width}
+        height={region.height}
+        className="draft-region halo"
+        fill="none"
+        stroke="#0d0c0a"
+        vectorEffect="non-scaling-stroke"
+      />
+      <rect
+        x={region.x}
+        y={region.y}
+        width={region.width}
+        height={region.height}
+        className="draft-region outline"
+        fill={`${color}18`}
+        stroke={color}
+        vectorEffect="non-scaling-stroke"
+      />
+    </>
+  );
+}
+
+function DraftLasso({ value, color }: { value: Point[]; color: string }) {
+  return (
+    <>
+      <polyline
+        points={points(value)}
+        className="draft-region halo"
+        fill="none"
+        stroke="#0d0c0a"
+        vectorEffect="non-scaling-stroke"
+      />
+      <polyline
+        points={points(value)}
+        className="draft-region outline"
+        fill={`${color}18`}
+        stroke={color}
+        vectorEffect="non-scaling-stroke"
+      />
+    </>
   );
 }
 

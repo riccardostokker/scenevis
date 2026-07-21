@@ -21,8 +21,10 @@ describe("comparison report", () => {
     expect(html).toContain("data:image/jpeg;base64,xyz789");
     expect(html).toContain("Robust Contrast-to-Noise Ratio");
     expect(html).toContain('data-zone="target"');
+    expect(html).toContain('stroke-width="1.6"');
+    expect(html).toContain('stroke-linejoin="round"');
+    expect(html).toContain('vector-effect="non-scaling-stroke"');
     expect(html).not.toContain("<text");
-    expect(html).not.toContain("vector-effect");
     expect(html).not.toContain("<script");
   });
 });

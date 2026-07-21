@@ -1,5 +1,12 @@
 import { formatMetric, METRICS } from "./metrics";
-import { REGION_COLORS, REGION_LABELS, REGION_NAMES, type Region, type RegionName } from "./model";
+import {
+  REGION_COLORS,
+  REGION_LABELS,
+  REGION_NAMES,
+  REGION_STROKES,
+  type Region,
+  type RegionName,
+} from "./model";
 import type { CompletedScenario } from "./scenarios";
 
 const HEADLINE_METRICS = METRICS.slice(0, 4);
@@ -65,11 +72,13 @@ function frame(scenario: CompletedScenario, index: number): string {
 
 function zone(name: RegionName, region: Region): string {
   const color = REGION_COLORS[name];
+  const treatment = REGION_STROKES.resting;
+  const shared = `vector-effect="non-scaling-stroke" stroke-linejoin="round"`;
   if (region.type === "polygon") {
     const points = region.points.map(([x, y]) => `${x},${y}`).join(" ");
-    return `<polygon points="${points}" fill="none" stroke="#171511" stroke-width="0.012"/><polygon data-zone="${name}" points="${points}" fill="${color}28" stroke="${color}" stroke-width="0.007"/>`;
+    return `<polygon points="${points}" fill="none" stroke="#0d0c0a" stroke-opacity="0.78" stroke-width="${treatment.halo}" stroke-linecap="round" ${shared}/><polygon data-zone="${name}" points="${points}" fill="${color}${treatment.fillAlpha}" stroke="${color}" stroke-width="${treatment.outline}" stroke-linecap="round" ${shared}/>`;
   }
-  return `<rect x="${region.x}" y="${region.y}" width="${region.width}" height="${region.height}" fill="none" stroke="#171511" stroke-width="0.012"/><rect data-zone="${name}" x="${region.x}" y="${region.y}" width="${region.width}" height="${region.height}" fill="${color}28" stroke="${color}" stroke-width="0.007"/>`;
+  return `<rect x="${region.x}" y="${region.y}" width="${region.width}" height="${region.height}" fill="none" stroke="#0d0c0a" stroke-opacity="0.78" stroke-width="${treatment.halo}" ${shared}/><rect data-zone="${name}" x="${region.x}" y="${region.y}" width="${region.width}" height="${region.height}" fill="${color}${treatment.fillAlpha}" stroke="${color}" stroke-width="${treatment.outline}" ${shared}/>`;
 }
 
 function escapeHtml(value: string): string {
