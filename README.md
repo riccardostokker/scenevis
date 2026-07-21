@@ -1,68 +1,109 @@
 # Scenevis
 
-Scenevis measures how clearly a selected target separates from its photographic surroundings.
-It combines a React image workspace with a typed Python analysis engine for Canon CR2, DNG,
-JPEG, PNG, and TIFF sources.
+[![CI](https://github.com/riccardostokker/scenevis/actions/workflows/ci.yml/badge.svg)](https://github.com/riccardostokker/scenevis/actions/workflows/ci.yml)
+[![Security](https://github.com/riccardostokker/scenevis/actions/workflows/security.yml/badge.svg)](https://github.com/riccardostokker/scenevis/actions/workflows/security.yml)
 
-The application keeps the original image, selected regions, preview, and result in browser
-memory. The local backend uses bounded temporary files only while decoding a request. It does not
-create region sidecars, retain images, or persist analysis state.
+Scenevis measures how clearly a selected target separates from its photographic surroundings. It
+combines an interactive React workspace with a typed Python analysis engine for RAW and raster
+images, then turns several photographed locations into one comparable visibility study.
 
-## Application
+The workflow is visual: add images, mark each target, review the suggested reference regions, and
+compare the resulting measurements. No YAML sidecars or project files are required.
 
-Start the development application with live reload:
+> [!NOTE]
+> Scenevis is an engineering comparison tool, not a calibrated lux meter. Measurements use
+> normalized linear image data; exposure-adjusted previews are used only for region placement.
+
+## What It Does
+
+- Accepts multiple Canon CR2, DNG, JPEG, PNG, and TIFF images in one workspace.
+- Keeps scenario names, regions, previews, and results in browser memory.
+- Supports box and freehand lasso selection with editable SVG regions.
+- Suggests local and bright reference regions as soon as the target is drawn.
+- Calculates eight ordered target-visibility measurements from linear source data.
+- Compares completed scenarios in aligned frames and a summary table.
+- Exports a self-contained HTML report with compressed images, zones, warnings, and KPI notes.
+- Supports light, dark, and system themes from desktop down to narrow screens.
+
+## Quick Start
+
+[Install mise](https://mise.jdx.dev/getting-started.html), then let the repository provision its
+pinned Python, uv, Node.js, pnpm, prek, and git-cliff toolchain:
 
 ```sh
+git clone git@github.com:riccardostokker/scenevis.git
+cd scenevis
+mise install
+mise run sync
 mise run dev
 ```
 
-Open <http://127.0.0.1:5173>, then:
+Open <http://127.0.0.1:5173> and follow the workspace from left to right:
 
-1. Drop or choose one or more RAW or raster images.
-2. Rename each scenario in the location rail when the filename is not descriptive enough.
+1. Drop or choose one or more photographs.
+2. Rename each scenario when the filename is not descriptive enough.
 3. Select **Target**, then draw it with the floating **Box** or **Lasso** tool.
-4. Review the detected **Local Background** and **Bright Background** regions. Use **Select**,
-   **Box**, or **Lasso** to inspect or refine them.
-5. Analyze scenarios individually or select **Analyze All** when every target is ready.
-6. Open **Compare** to review aligned KPIs, then select **Export Report**.
+4. Review or refine the detected **Local Background** and **Bright Background**.
+5. Analyze each scenario, or use **Analyze All** when every target is ready.
+6. Open **Compare**, then export the finished location study as HTML.
 
-The HTML artifact embeds a compressed display preview and validated zones for every completed
-scenario, an aligned comparison table, warnings, ordered KPI values, and their descriptions. It
-contains no external assets or executable scripts.
+## Automatic Regions
 
-Build the frontend into the Python package and run the single-word CLI:
+The target always comes from the user. The other two boxes are suggestions and remain fully
+editable:
+
+- **Local Background** expands the target bounds to 2.5 times their width and height, centers the
+  box on the target, and keeps it inside the image. Target pixels are excluded when this region is
+  measured.
+- **Bright Background** scans the display preview for the 15%-wide by 15%-high box with the
+  highest average brightness.
+
+Select **Redetect** at any time to rebuild both suggestions from the current target.
+
+## Measurements
+
+Scenevis orders evidence by its usefulness when comparing target visibility:
+
+| Measurement | What it shows |
+| --- | --- |
+| Robust Contrast-to-Noise Ratio | Target separation from its local background, including variation in both regions |
+| Weber Contrast | Signed target brightness relative to the local background |
+| Target Dynamic Range | Bright-background to target separation in photographic stops |
+| Target Signal-to-Noise Ratio | Target signal relative to variation within the target region |
+| Bright-Background Clipping | Share of reference pixels at or above 99% |
+| Target Shadows Below 1% | Share of target pixels near the normalized linear shadow floor |
+| Local-Background Dynamic Range | Bright-background to local-background separation in stops |
+| Michelson Contrast | Symmetric supporting contrast between target and local background |
+
+Validity warnings are shown separately from the measurements. There are deliberately no universal
+pass/fail thresholds: acceptable visibility depends on the scene, display, task, and observer.
+
+## Reports and Data Handling
+
+The exported HTML report embeds a compressed display preview and validated zones for every
+completed scenario. It also contains an aligned comparison table, ordered KPI values, their
+plain-language descriptions, and measurement warnings. The artifact has no external assets or
+executable scripts, so it can be opened and shared as a single file.
+
+The browser keeps the original image, selections, preview, and result in memory for the current
+session. The local backend uses bounded temporary files only while decoding a request. It does not
+retain images, persist analysis state, or create region sidecars.
+
+## Packaged Application
+
+Build the frontend into the Python package and start the single-word CLI:
 
 ```sh
 mise run build:dev
-scenevis
+uv run --no-sync scenevis
 ```
 
-`scenevis --no-browser` starts the packaged app without opening a browser automatically. The
-packaged service listens on `127.0.0.1:8765` by default.
-
-## Measurement Order
-
-The interface presents the most relevant target-visibility evidence first:
-
-1. **Robust Contrast-to-Noise Ratio**
-2. **Weber Contrast**
-3. **Target Dynamic Range**
-4. **Target Signal-to-Noise Ratio**
-5. **Bright-Background Clipping**
-6. **Target Shadows Below 1%**
-7. **Local-Background Dynamic Range**
-8. **Michelson Contrast**
-
-Each metric includes a plain-language description directly below its Title Case name. Validity
-warnings remain visually separate from the measurements.
-
-Scenevis is an engineering comparison tool, not a calibrated lux meter. Quantitative work uses
-normalized linear image data. Display previews are exposure-adjusted and never feed back into the
-measurement pipeline.
+`uv run --no-sync scenevis --no-browser` starts the packaged application without opening a browser.
+The packaged service listens on `127.0.0.1:8765` by default.
 
 ## Architecture
 
-The repository is organized by workflow ownership:
+The repository is divided by workflow ownership:
 
 ```text
 scenevis/
@@ -70,7 +111,7 @@ scenevis/
 │   └── src/
 │       ├── app/                      application composition
 │       ├── components/ui/            shadcn UI primitives
-│       ├── features/scene-analysis/ scenario state, region editing, KPIs, and reports
+│       ├── features/scene-analysis/ scenario editing, comparison, and reports
 │       └── shared/api/               generated contract types and client
 ├── src/scenevis/
 │   ├── scene/                        image loading and normalized regions
@@ -81,48 +122,19 @@ scenevis/
 ```
 
 FastAPI owns the OpenAPI contract. `openapi-typescript` derives the frontend schema from it, and
-`mise run contract:check` prevents drift. The transport accepts two commands:
+`mise run contract:check` prevents drift. The transport exposes two commands:
 
-- `POST /api/previews`: upload one image and receive a compressed display preview, metadata, and a
-  bright-background suggestion.
-- `POST /api/analyses`: upload the image plus normalized in-memory regions and receive the result
-  with the validated regions that produced it.
+- `POST /api/previews` returns a compressed preview, image metadata, and a bright-background
+  suggestion.
+- `POST /api/analyses` accepts the image plus normalized in-memory regions and returns the
+  measurements with the validated regions that produced them.
 
-Both operations return a stable error envelope and reject unsupported, empty, or larger-than-100
-MiB uploads.
-
-## Development
-
-Install the pinned Python and Node toolchains, locked dependencies, and hooks:
-
-```sh
-mise install
-mise run sync
-mise run hooks:install
-```
-
-Use the mise task surface:
-
-```sh
-mise run check
-mise run test
-mise run test:gui
-mise run test:gui:e2e
-mise run test:fixtures
-mise run audit
-mise run build:dev
-mise run python:release
-```
-
-`check` is read-only and covers Python formatting, Ruff, ty, Biome, TypeScript, version metadata,
-both lockfiles, and API-contract drift. The normal Python suite excludes the slower original-camera
-lane.
-
-Full-resolution Canon EOS 200D fixtures live under `tests/fixtures/canon_eos_200d/`. Their JSON
-manifest records source provenance, exact byte sizes, dimensions, and SHA-256 hashes. Run the
-original CR2 integration path explicitly with `mise run test:fixtures`.
+Both operations use a stable error envelope and reject unsupported, empty, or larger-than-100 MiB
+uploads.
 
 ## Python API
+
+The analysis engine can also be used without the browser:
 
 ```python
 from pathlib import Path
@@ -151,4 +163,32 @@ SNR_target = target_median / target_sigma
 sigma_robust = 1.4826 × median(|x - median(x)|)
 ```
 
-Thresholds are reported as measurements and warnings rather than universal pass/fail rules.
+## Development
+
+Install dependencies and prepare the Git hooks once:
+
+```sh
+mise run sync
+mise run hooks:install
+mise run browser:install
+```
+
+The main tasks are:
+
+| Command | Purpose |
+| --- | --- |
+| `mise run check` | Formatting, linting, types, lockfiles, Actions syntax, versions, and API-contract drift |
+| `mise run test` | Python unit and API integration tests |
+| `mise run test:gui` | React unit and component tests |
+| `mise run test:gui:e2e` | Curated two-image browser and report-export journey |
+| `mise run test:fixtures` | Full-resolution Canon JPEG and CR2 coverage |
+| `mise run audit` | Secret and locked-dependency security audit |
+| `mise run build:dev` | Build the web application into the Python package |
+| `mise run python:release` | Build the wheel and source distribution |
+
+The normal Python suite excludes the slower original-camera lane. Fixture provenance, dimensions,
+byte sizes, and SHA-256 hashes live in `tests/fixtures/canon_eos_200d/manifest.json`.
+
+GitHub Actions run the fast checks and tests on every pull request, exercise the complete browser
+workflow, audit dependencies and repository history, and build GitHub release artifacts from
+`vX.Y.Z` tags.
