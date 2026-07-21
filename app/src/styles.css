@@ -27,6 +27,31 @@ body {
   background: #1b1916;
 }
 
+.file-drop-zone {
+  min-height: 100vh;
+}
+
+.drop-overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 16px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed var(--accent);
+  background: rgb(27 25 22 / 92%);
+  pointer-events: none;
+}
+
+.drop-overlay > div {
+  text-align: center;
+}
+
+.drop-overlay strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  font-weight: 500;
+}
+
 button,
 input {
   font: inherit;
@@ -202,8 +227,22 @@ h3 {
   inset: 0;
   width: 100%;
   height: 100%;
-  cursor: crosshair;
   touch-action: none;
+}
+
+.scene-canvas.mode-select svg {
+  cursor: default;
+}
+
+.scene-canvas.mode-box svg {
+  cursor: crosshair;
+}
+
+.scene-canvas.mode-lasso svg {
+  cursor:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='8' cy='8' r='4' fill='none' stroke='%23e3a43f' stroke-width='2'/%3E%3Cpath d='M11 11l7 7' stroke='%23e3a43f' stroke-width='2'/%3E%3C/svg%3E")
+    8 8,
+    crosshair;
 }
 
 .scene-canvas text {
@@ -211,50 +250,105 @@ h3 {
   pointer-events: none;
 }
 
-.region-toolbar {
+.selection-toolbar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
   gap: 1px;
-  margin-top: 1px;
-  overflow: hidden;
+  margin-bottom: 1px;
+  padding: 1px;
   background: var(--line);
-  border: 0;
+}
+
+.region-tools {
+  grid-column: 1 / -1;
+}
+
+.region-tools button {
+  flex: 1;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 1px;
+  margin: 0;
   padding: 0;
+  border: 0;
 }
 
-.region-toolbar legend {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+.toolbar-group legend {
+  padding: 0 12px;
+  color: var(--muted);
+  background: var(--paper);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  line-height: 46px;
+  text-transform: uppercase;
 }
 
-.region-toolbar button {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 10px;
+.selection-toolbar button {
+  display: inline-flex;
+  min-height: 46px;
   align-items: center;
-  min-height: 54px;
-  padding: 0 14px;
+  gap: 8px;
+  padding: 0 12px;
   border-radius: 0;
   color: var(--ink);
   background: var(--paper);
-  text-align: left;
 }
 
-.region-toolbar button:hover,
-.region-toolbar button.active {
+.selection-toolbar button:hover:not(:disabled),
+.selection-toolbar button.active {
   background: var(--paper-raised);
 }
 
-.region-toolbar button.active {
+.selection-toolbar button.active {
   box-shadow: inset 0 -3px var(--accent);
 }
 
-.region-toolbar small {
+.selection-toolbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.selection-toolbar small {
   color: var(--muted);
+  font-size: 0.67rem;
+}
+
+.drawing-tools {
+  margin-left: 0;
+}
+
+.selection-toolbar .clear-region {
+  color: var(--muted);
+}
+
+.tool-mark {
+  display: inline-grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  color: var(--accent);
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.box-mark {
+  border: 1.5px solid currentColor;
+}
+
+.lasso-mark {
+  border: 1.5px dashed currentColor;
+  border-radius: 48% 56% 50% 42%;
+}
+
+.draft-region {
+  fill: rgb(227 164 63 / 8%);
+  stroke-width: 0.006;
+  stroke-dasharray: 0.012 0.008;
+  vector-effect: non-scaling-stroke;
 }
 
 .region-dot {
@@ -417,8 +511,34 @@ h3 {
     align-items: start;
   }
 
-  .region-toolbar {
+  .selection-toolbar,
+  .toolbar-group {
+    flex-wrap: wrap;
+  }
+
+  .selection-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .region-tools {
+    grid-column: auto;
+  }
+
+  .drawing-tools {
+    margin-left: 0;
+  }
+
+  .selection-toolbar .clear-region {
+    width: 100%;
+  }
+
+  .selection-toolbar button {
+    flex: 1 1 auto;
+  }
+
+  .toolbar-group legend {
+    width: 100%;
+    line-height: 30px;
   }
 
   .side-column {

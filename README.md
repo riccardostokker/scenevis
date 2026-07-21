@@ -18,9 +18,10 @@ mise run dev
 
 Open <http://127.0.0.1:5173>, then:
 
-1. Choose a RAW or raster image.
-2. Draw a rectangle around the target.
-3. Review or redraw the suggested local and bright backgrounds.
+1. Drop or choose a RAW or raster image.
+2. Select **Target**, then draw it with the **Box** or **Lasso** tool.
+3. Draw the **Local Background** and **Bright Background** regions the same way. Use **Select** to
+   inspect an existing region.
 4. Select **Analyze Scene**.
 5. Select **Export Static HTML** to save a self-contained report.
 

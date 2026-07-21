@@ -7,17 +7,18 @@ import {
   type Preview,
 } from "../../shared/api/client";
 import { downloadReport } from "./export";
+import { FileDropZone } from "./FileDropZone";
 import { MetricPanel } from "./MetricPanel";
 import {
   complete,
-  REGION_LABELS,
   REGION_NAMES,
-  type Rectangle,
+  type DrawingMode,
+  type Region,
   type RegionName,
   type Selection,
 } from "./model";
 import { SceneCanvas } from "./SceneCanvas";
-import { suggestions } from "./selection";
+import { SelectionToolbar } from "./SelectionToolbar";
 
 type Activity = "idle" | "preview" | "analysis";
 
@@ -26,6 +27,7 @@ export function Workspace() {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [selection, setSelection] = useState<Selection>({});
   const [active, setActive] = useState<RegionName>("target");
+  const [mode, setMode] = useState<DrawingMode>("box");
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [activity, setActivity] = useState<Activity>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +38,7 @@ export function Workspace() {
     setSelection({});
     setAnalysis(null);
     setActive("target");
+    setMode("box");
     setError(null);
     setActivity("preview");
     try {
@@ -47,13 +50,8 @@ export function Workspace() {
     }
   }
 
-  function selectRegion(name: RegionName, region: Rectangle) {
+  function selectRegion(name: RegionName, region: Region) {
     setAnalysis(null);
-    if (name === "target" && preview) {
-      setSelection(suggestions(region, preview.bright_background_suggestion));
-      setActive("local_background");
-      return;
-    }
     setSelection((current) => ({ ...current, [name]: region }));
     const index = REGION_NAMES.indexOf(name);
     const next = REGION_NAMES[index + 1];
@@ -74,7 +72,7 @@ export function Workspace() {
   }
 
   return (
-    <>
+    <FileDropZone onFile={(nextFile) => void chooseImage(nextFile)}>
       <header className="masthead">
         <div>
           <p className="eyebrow">Photographic Visibility Analysis</p>
@@ -128,28 +126,30 @@ export function Workspace() {
               </p>
             </div>
 
+            <SelectionToolbar
+              activeRegion={active}
+              mode={mode}
+              selection={selection}
+              onActiveRegionChange={setActive}
+              onModeChange={setMode}
+              onClear={() => {
+                setAnalysis(null);
+                setSelection((current) => {
+                  const next = { ...current };
+                  delete next[active];
+                  return next;
+                });
+              }}
+            />
+
             <SceneCanvas
               image={preview.preview_data_url}
               selection={selection}
               active={active}
+              mode={mode}
+              onActiveChange={setActive}
               onSelect={selectRegion}
             />
-
-            <fieldset className="region-toolbar">
-              <legend>Region Selection</legend>
-              {REGION_NAMES.map((name) => (
-                <button
-                  type="button"
-                  key={name}
-                  className={active === name ? "active" : ""}
-                  onClick={() => setActive(name)}
-                >
-                  <span className={`region-dot ${name}`} />
-                  {REGION_LABELS[name]}
-                  <small>{selection[name] ? "Ready" : "Draw"}</small>
-                </button>
-              ))}
-            </fieldset>
           </section>
 
           <aside className="side-column">
@@ -157,8 +157,8 @@ export function Workspace() {
               <p className="eyebrow">Workflow</p>
               <h2>Measure the Target</h2>
               <p>
-                Draw the target first. Scenevis suggests both backgrounds; redraw any region to
-                refine it before analysis.
+                Choose a region and drawing tool, then mark the target and both backgrounds on the
+                canvas. Use Select to inspect an existing region.
               </p>
               <button
                 type="button"
@@ -191,7 +191,7 @@ export function Workspace() {
           </aside>
         </main>
       )}
-    </>
+    </FileDropZone>
   );
 }
 
