@@ -10,6 +10,16 @@ images, then turns several photographed locations into one comparable visibility
 The workflow is visual: add images, mark each target, review the suggested reference regions, and
 compare the resulting measurements. No YAML sidecars or project files are required.
 
+## Interface
+
+![Scenevis annotation workspace with two photographic scenarios](docs/assets/scenevis-annotation.png)
+
+*Draw or refine each target and its reference regions directly over the source preview.*
+
+![Scenevis comparison workspace with two analyzed scenarios](docs/assets/scenevis-comparison.png)
+
+*Compare the most important measurements across locations before opening the full report.*
+
 > [!NOTE]
 > Scenevis is an engineering comparison tool, not a calibrated lux meter. Measurements use
 > normalized linear image data; exposure-adjusted previews are used only for region placement.
