@@ -3,6 +3,8 @@ python = "3.14.6"
 uv = "0.11.29"
 prek = "0.4.10"
 git-cliff = "2.13.1"
+node = "24"
+pnpm = "11"
 
 [settings]
 python.uv_venv_auto = true
@@ -13,7 +15,10 @@ UV_PYTHON = "3.14.6"
 
 [tasks.sync]
 description = "Install or refresh the locked development environment."
-run = "uv sync --locked"
+run = [
+    "uv sync --locked",
+    "pnpm --dir app install --frozen-lockfile",
+]
 
 [tasks.install]
 description = "Alias for sync."
@@ -21,38 +26,89 @@ depends = ["sync"]
 
 [tasks.format]
 description = "Check formatting without rewriting files."
-run = "uv run --no-sync ruff format --check src tests scripts"
+run = [
+    "uv run --no-sync ruff format --check src tests scripts",
+    "pnpm --dir app format",
+]
 
 [tasks."format:fix"]
 description = "Rewrite Python formatting."
-run = "uv run --no-sync ruff format src tests scripts"
+run = [
+    "uv run --no-sync ruff format src tests scripts",
+    "pnpm --dir app format:fix",
+]
 
 [tasks.lint]
 description = "Run Ruff lint checks."
-run = "uv run --no-sync ruff check src tests scripts"
+run = [
+    "uv run --no-sync ruff check src tests scripts",
+    "pnpm --dir app lint",
+]
 
 [tasks."lint:fix"]
 description = "Apply Ruff fixes and then format changes."
 run = [
     "uv run --no-sync ruff check --fix src tests scripts",
+    "pnpm --dir app lint:fix",
     "mise run format:fix",
 ]
 
 [tasks.typecheck]
 description = "Run static type checks with ty."
-run = "uv run --no-sync ty check src tests scripts"
+run = [
+    "uv run --no-sync ty check src tests scripts",
+    "pnpm --dir app typecheck",
+]
 
 [tasks.test]
 description = "Run Python tests."
 run = "uv run --no-sync pytest"
 
+[tasks."test:gui"]
+description = "Run frontend unit and component tests."
+run = "pnpm --dir app test"
+
+[tasks."test:gui:e2e"]
+description = "Run the browser analysis and export journey."
+run = "pnpm --dir app exec playwright test"
+
 [tasks."test:fixtures"]
 description = "Run full-resolution Canon camera fixture tests."
 run = "uv run --no-sync pytest -m camera_fixture"
 
+[tasks."contract:check"]
+description = "Verify OpenAPI and generated frontend types are current."
+run = "uv run --no-sync python scripts/check_contract.py"
+
+[tasks."contract:sync"]
+description = "Regenerate OpenAPI and frontend API types."
+run = [
+    "uv run --no-sync python scripts/export_openapi.py",
+    "pnpm --dir app contract:sync",
+]
+
 [tasks.check]
 description = "Run the fast read-only validation aggregate."
-depends = ["version:check", "format", "lint", "typecheck"]
+depends = ["version:check", "contract:check", "format", "lint", "typecheck"]
+
+[tasks.audit]
+description = "Audit locked Python and frontend dependencies."
+run = [
+    "uv run --no-sync pip-audit",
+    "pnpm --dir app audit --audit-level high",
+]
+
+[tasks.dev]
+description = "Run the local API and Vite application with reload."
+run = "uv run --no-sync python scripts/dev.py"
+
+[tasks."build:gui"]
+description = "Build the browser application into the Python package."
+run = "pnpm --dir app build"
+
+[tasks."build:dev"]
+description = "Build the complete local application."
+depends = ["build:gui"]
 
 [tasks.hooks]
 description = "Run all prek hooks on all files."
@@ -75,6 +131,7 @@ description = "Verify committed version metadata and the lockfile without rewrit
 run = [
     "uv run --no-sync python scripts/check_version.py",
     "uv lock --check",
+    "pnpm --dir app install --frozen-lockfile --lockfile-only",
 ]
 
 [tasks."version:sync"]
@@ -91,4 +148,7 @@ run = "git-cliff --unreleased --strip all"
 
 [tasks."python:release"]
 description = "Build wheel and source distribution artifacts."
-run = "uv build"
+run = [
+    "mise run build:gui",
+    "uv build",
+]

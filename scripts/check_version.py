@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import tomllib
 from pathlib import Path
@@ -14,12 +15,17 @@ def main() -> None:
     if SEMVER.fullmatch(version) is None:
         raise RuntimeError(f"project.version is not a supported SemVer value: {version!r}")
 
-    assert_contains(ROOT / "src" / "scene_analyzer" / "__init__.py", f'__version__ = "{version}"')
+    assert_contains(ROOT / "src" / "scenevis" / "__init__.py", f'__version__ = "{version}"')
+    package = json.loads((ROOT / "app" / "package.json").read_text(encoding="utf-8"))
+    if package.get("version") != version:
+        raise RuntimeError("app/package.json version does not match pyproject.toml")
     assert_contains(ROOT / "cliff.toml", 'initial_tag = "v0.1.0"')
     assert_contains(ROOT / "cliff.toml", "features_always_bump_minor = false")
     assert_contains(ROOT / "cliff.toml", "breaking_always_bump_major = false")
     if not (ROOT / "uv.lock").exists():
         raise RuntimeError("uv.lock is missing; run mise run version:sync")
+    if not (ROOT / "app" / "pnpm-lock.yaml").exists():
+        raise RuntimeError("app/pnpm-lock.yaml is missing; run mise run sync")
 
 
 def project_version() -> str:

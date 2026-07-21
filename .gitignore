@@ -11,7 +11,16 @@ __pycache__/
 # Build artifacts
 /build/
 /dist/
+/results/
+/src/scenevis/api/static/
 *.egg-info/
+
+# Frontend dependencies and test artifacts
+/app/node_modules/
+/app/coverage/
+/app/playwright-report/
+/app/test-results/
+*.tsbuildinfo
 
 # Local configuration and secrets
 .env

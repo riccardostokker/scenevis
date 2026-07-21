@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 from typing import TypedDict, cast
 
 import numpy as np
 import pytest
-import yaml
 
-from scene_analyzer.scene.load import load
+from scenevis.scene.load import load
 
 FIXTURE_DIR = Path(__file__).parents[2] / "fixtures" / "canon_eos_200d"
 
@@ -30,8 +30,8 @@ class Manifest(TypedDict):
 
 
 def fixtures() -> list[Fixture]:
-    with (FIXTURE_DIR / "manifest.yaml").open(encoding="utf-8") as stream:
-        return cast(Manifest, yaml.safe_load(stream))["files"]
+    with (FIXTURE_DIR / "manifest.json").open(encoding="utf-8") as stream:
+        return cast(Manifest, json.load(stream))["files"]
 
 
 @pytest.mark.camera_fixture

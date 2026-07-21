@@ -6,8 +6,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE_FILES = (
+    "app/openapi.json",
+    "app/package.json",
+    "app/pnpm-lock.yaml",
+    "app/src/shared/api/schema.ts",
     "pyproject.toml",
-    "src/scene_analyzer/__init__.py",
+    "src/scenevis/__init__.py",
     "uv.lock",
     "CHANGELOG.md",
 )
@@ -35,6 +39,8 @@ def release() -> None:
     run(["mise", "run", "typecheck"])
     run(["mise", "run", "check"])
     run(["mise", "run", "test"])
+    run(["mise", "run", "test:gui"])
+    run(["mise", "run", "test:gui:e2e"])
     run(["mise", "run", "python:release"])
 
     run(["git", "add", *RELEASE_FILES])

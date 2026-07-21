@@ -1,0 +1,738 @@
+{
+  "components": {
+    "schemas": {
+      "Analysis": {
+        "description": "Analysis result paired with the validated regions that produced it.",
+        "properties": {
+          "regions": {
+            "$ref": "#/components/schemas/Regions"
+          },
+          "result": {
+            "$ref": "#/components/schemas/Result"
+          }
+        },
+        "required": ["result", "regions"],
+        "title": "Analysis",
+        "type": "object"
+      },
+      "Body_createAnalysis": {
+        "properties": {
+          "image": {
+            "contentMediaType": "application/octet-stream",
+            "description": "RAW or raster image",
+            "title": "Image",
+            "type": "string"
+          },
+          "regions": {
+            "description": "Normalized region JSON",
+            "title": "Regions",
+            "type": "string"
+          }
+        },
+        "required": ["image", "regions"],
+        "title": "Body_createAnalysis",
+        "type": "object"
+      },
+      "Body_createPreview": {
+        "properties": {
+          "image": {
+            "contentMediaType": "application/octet-stream",
+            "description": "RAW or raster image",
+            "title": "Image",
+            "type": "string"
+          }
+        },
+        "required": ["image"],
+        "title": "Body_createPreview",
+        "type": "object"
+      },
+      "Health": {
+        "description": "Service readiness response.",
+        "properties": {
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "Health",
+        "type": "object"
+      },
+      "MetadataValue": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "Metrics": {
+        "description": "Primary transparent scene-visibility KPIs.",
+        "properties": {
+          "bright_blue_clipped_99_percent": {
+            "title": "Bright Blue Clipped 99 Percent",
+            "type": "number"
+          },
+          "bright_clipped_99_9_percent": {
+            "title": "Bright Clipped 99 9 Percent",
+            "type": "number"
+          },
+          "bright_clipped_99_percent": {
+            "title": "Bright Clipped 99 Percent",
+            "type": "number"
+          },
+          "bright_green_clipped_99_percent": {
+            "title": "Bright Green Clipped 99 Percent",
+            "type": "number"
+          },
+          "bright_red_clipped_99_percent": {
+            "title": "Bright Red Clipped 99 Percent",
+            "type": "number"
+          },
+          "cnr_robust": {
+            "title": "Cnr Robust",
+            "type": "number"
+          },
+          "cnr_standard": {
+            "title": "Cnr Standard",
+            "type": "number"
+          },
+          "dr_local_median_stops": {
+            "title": "Dr Local Median Stops",
+            "type": "number"
+          },
+          "dr_target_median_stops": {
+            "title": "Dr Target Median Stops",
+            "type": "number"
+          },
+          "dr_target_p95_to_p50_stops": {
+            "title": "Dr Target P95 To P50 Stops",
+            "type": "number"
+          },
+          "dr_target_p99_to_p50_stops": {
+            "title": "Dr Target P99 To P50 Stops",
+            "type": "number"
+          },
+          "image_clipped_99_percent": {
+            "title": "Image Clipped 99 Percent",
+            "type": "number"
+          },
+          "michelson_contrast": {
+            "title": "Michelson Contrast",
+            "type": "number"
+          },
+          "snr_target_robust": {
+            "title": "Snr Target Robust",
+            "type": "number"
+          },
+          "snr_target_standard": {
+            "title": "Snr Target Standard",
+            "type": "number"
+          },
+          "target_below_0_1_percent": {
+            "title": "Target Below 0 1 Percent",
+            "type": "number"
+          },
+          "target_below_0_25_percent": {
+            "title": "Target Below 0 25 Percent",
+            "type": "number"
+          },
+          "target_below_0_5_percent": {
+            "title": "Target Below 0 5 Percent",
+            "type": "number"
+          },
+          "target_below_1_percent": {
+            "title": "Target Below 1 Percent",
+            "type": "number"
+          },
+          "target_below_2_percent": {
+            "title": "Target Below 2 Percent",
+            "type": "number"
+          },
+          "target_below_shadow_threshold": {
+            "title": "Target Below Shadow Threshold",
+            "type": "number"
+          },
+          "target_clipped_99_percent": {
+            "title": "Target Clipped 99 Percent",
+            "type": "number"
+          },
+          "weber_contrast_absolute": {
+            "title": "Weber Contrast Absolute",
+            "type": "number"
+          },
+          "weber_contrast_signed": {
+            "title": "Weber Contrast Signed",
+            "type": "number"
+          }
+        },
+        "required": [
+          "dr_target_median_stops",
+          "dr_local_median_stops",
+          "dr_target_p95_to_p50_stops",
+          "dr_target_p99_to_p50_stops",
+          "weber_contrast_signed",
+          "weber_contrast_absolute",
+          "michelson_contrast",
+          "cnr_robust",
+          "cnr_standard",
+          "snr_target_robust",
+          "snr_target_standard",
+          "target_below_0_1_percent",
+          "target_below_0_25_percent",
+          "target_below_0_5_percent",
+          "target_below_1_percent",
+          "target_below_2_percent",
+          "target_below_shadow_threshold",
+          "bright_clipped_99_percent",
+          "bright_clipped_99_9_percent",
+          "bright_red_clipped_99_percent",
+          "bright_green_clipped_99_percent",
+          "bright_blue_clipped_99_percent",
+          "target_clipped_99_percent",
+          "image_clipped_99_percent"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
+      "Point": {
+        "maxItems": 2,
+        "minItems": 2,
+        "prefixItems": [
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          }
+        ],
+        "type": "array"
+      },
+      "Polygon": {
+        "description": "A normalized polygonal region.",
+        "properties": {
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "type": {
+            "const": "polygon",
+            "default": "polygon",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": ["points"],
+        "title": "Polygon",
+        "type": "object"
+      },
+      "Preview": {
+        "description": "Compressed display preview and source information.",
+        "properties": {
+          "bright_background_suggestion": {
+            "$ref": "#/components/schemas/Rectangle"
+          },
+          "height_px": {
+            "title": "Height Px",
+            "type": "integer"
+          },
+          "image": {
+            "title": "Image",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MetadataValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "preview_data_url": {
+            "title": "Preview Data Url",
+            "type": "string"
+          },
+          "processing": {
+            "$ref": "#/components/schemas/Processing"
+          },
+          "version": {
+            "const": 1,
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "width_px": {
+            "title": "Width Px",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "image",
+          "width_px",
+          "height_px",
+          "preview_data_url",
+          "bright_background_suggestion",
+          "metadata",
+          "processing"
+        ],
+        "title": "Preview",
+        "type": "object"
+      },
+      "Problem": {
+        "description": "Stable caller-facing error envelope.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": ["code", "message"],
+        "title": "Problem",
+        "type": "object"
+      },
+      "Processing": {
+        "description": "Reproducible processing choices applied before measurement.",
+        "properties": {
+          "black_level_per_channel": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Black Level Per Channel"
+          },
+          "linear": {
+            "title": "Linear",
+            "type": "boolean"
+          },
+          "profile": {
+            "title": "Profile",
+            "type": "string"
+          },
+          "settings": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SettingValue"
+            },
+            "title": "Settings",
+            "type": "object"
+          },
+          "source": {
+            "enum": ["raw", "raster"],
+            "title": "Source",
+            "type": "string"
+          },
+          "white_balance_policy": {
+            "title": "White Balance Policy",
+            "type": "string"
+          },
+          "white_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "White Level"
+          }
+        },
+        "required": ["source", "linear", "profile", "white_balance_policy", "settings"],
+        "title": "Processing",
+        "type": "object"
+      },
+      "Rectangle": {
+        "description": "A normalized rectangular region.",
+        "properties": {
+          "height": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Height",
+            "type": "number"
+          },
+          "type": {
+            "const": "rectangle",
+            "default": "rectangle",
+            "title": "Type",
+            "type": "string"
+          },
+          "width": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Width",
+            "type": "number"
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": ["x", "y", "width", "height"],
+        "title": "Rectangle",
+        "type": "object"
+      },
+      "Region": {
+        "discriminator": {
+          "mapping": {
+            "polygon": "#/components/schemas/Polygon",
+            "rectangle": "#/components/schemas/Rectangle"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Rectangle"
+          },
+          {
+            "$ref": "#/components/schemas/Polygon"
+          }
+        ]
+      },
+      "RegionStatistics": {
+        "description": "Robust and conventional statistics for one region.",
+        "properties": {
+          "coefficient_of_variation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coefficient Of Variation"
+          },
+          "interquartile_range": {
+            "title": "Interquartile Range",
+            "type": "number"
+          },
+          "maximum": {
+            "title": "Maximum",
+            "type": "number"
+          },
+          "mean": {
+            "title": "Mean",
+            "type": "number"
+          },
+          "median": {
+            "title": "Median",
+            "type": "number"
+          },
+          "minimum": {
+            "title": "Minimum",
+            "type": "number"
+          },
+          "percentile_1": {
+            "title": "Percentile 1",
+            "type": "number"
+          },
+          "percentile_25": {
+            "title": "Percentile 25",
+            "type": "number"
+          },
+          "percentile_5": {
+            "title": "Percentile 5",
+            "type": "number"
+          },
+          "percentile_5_to_95_range": {
+            "title": "Percentile 5 To 95 Range",
+            "type": "number"
+          },
+          "percentile_75": {
+            "title": "Percentile 75",
+            "type": "number"
+          },
+          "percentile_95": {
+            "title": "Percentile 95",
+            "type": "number"
+          },
+          "percentile_99": {
+            "title": "Percentile 99",
+            "type": "number"
+          },
+          "pixel_count": {
+            "title": "Pixel Count",
+            "type": "integer"
+          },
+          "robust_sigma": {
+            "title": "Robust Sigma",
+            "type": "number"
+          },
+          "standard_deviation": {
+            "title": "Standard Deviation",
+            "type": "number"
+          }
+        },
+        "required": [
+          "pixel_count",
+          "mean",
+          "median",
+          "minimum",
+          "maximum",
+          "standard_deviation",
+          "robust_sigma",
+          "percentile_1",
+          "percentile_5",
+          "percentile_25",
+          "percentile_75",
+          "percentile_95",
+          "percentile_99",
+          "interquartile_range",
+          "percentile_5_to_95_range",
+          "coefficient_of_variation"
+        ],
+        "title": "RegionStatistics",
+        "type": "object"
+      },
+      "Regions": {
+        "description": "The three regions required for primary visibility analysis.",
+        "properties": {
+          "bright_background": {
+            "$ref": "#/components/schemas/Region"
+          },
+          "local_background": {
+            "$ref": "#/components/schemas/Region"
+          },
+          "target": {
+            "$ref": "#/components/schemas/Region"
+          }
+        },
+        "required": ["target", "local_background", "bright_background"],
+        "title": "Regions",
+        "type": "object"
+      },
+      "Result": {
+        "description": "Versioned, serializable result for one analyzed scene.",
+        "properties": {
+          "image": {
+            "title": "Image",
+            "type": "string"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MetadataValue"
+            },
+            "title": "Metadata",
+            "type": "object"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "preview_notice": {
+            "default": "Preview brightness has been adjusted. Metrics were calculated from linear source data.",
+            "title": "Preview Notice",
+            "type": "string"
+          },
+          "processing": {
+            "$ref": "#/components/schemas/Processing"
+          },
+          "region_statistics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RegionStatistics"
+            },
+            "title": "Region Statistics",
+            "type": "object"
+          },
+          "scene_id": {
+            "title": "Scene Id",
+            "type": "string"
+          },
+          "version": {
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scene_id",
+          "image",
+          "metadata",
+          "processing",
+          "region_statistics",
+          "metrics",
+          "warnings"
+        ],
+        "title": "Result",
+        "type": "object"
+      },
+      "SettingValue": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Scenevis API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/analyses": {
+      "post": {
+        "description": "Analyze one image with browser-authored regions without persisting either.",
+        "operationId": "createAnalysis",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_createAnalysis"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Analysis"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Create Analysis"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "description": "Report local service readiness.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/previews": {
+      "post": {
+        "description": "Decode one image and return a compressed, display-only preview.",
+        "operationId": "createPreview",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_createPreview"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Create Preview"
+      }
+    }
+  }
+}

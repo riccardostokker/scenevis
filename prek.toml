@@ -38,6 +38,15 @@ always_run = true
 require_serial = true
 
 [[repos.hooks]]
+id = "test-gui"
+name = "mise test:gui"
+entry = "mise run test:gui"
+language = "system"
+pass_filenames = false
+always_run = true
+require_serial = true
+
+[[repos.hooks]]
 id = "conventional-commit"
 name = "conventional commit"
 entry = "uv run --no-sync python scripts/validate_commit_msg.py"

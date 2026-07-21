@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pytest
 
-from scene_analyzer.analysis.metrics import (
+from scenevis.analysis.metrics import (
     fraction_below,
     fraction_clipped,
     michelson,

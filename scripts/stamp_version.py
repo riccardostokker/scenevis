@@ -8,7 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_TOML = ROOT / "pyproject.toml"
-INIT_PY = ROOT / "src" / "scene_analyzer" / "__init__.py"
+INIT_PY = ROOT / "src" / "scenevis" / "__init__.py"
+PACKAGE_JSON = ROOT / "app" / "package.json"
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 
 
@@ -20,7 +21,9 @@ def main() -> None:
 
     replace_line(PYPROJECT_TOML, r'^version = "[^"]+"$', f'version = "{version}"')
     replace_line(INIT_PY, r'^__version__ = "[^"]+"$', f'__version__ = "{version}"')
+    replace_line(PACKAGE_JSON, r'^  "version": "[^"]+",$', f'  "version": "{version}",')
     subprocess.run(["uv", "lock"], cwd=ROOT, check=True)
+    subprocess.run(["mise", "run", "contract:sync"], cwd=ROOT, check=True)
     print(version)
 
 
