@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality and Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install the pinned toolchain
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4
+        with:
+          version: 2026.6.14
+          cache: true
+      - name: Install locked dependencies
+        run: mise run sync
+      - name: Check formatting, types, contracts, and metadata
+        run: mise run check
+      - name: Test the Python engine and API
+        run: mise run test
+      - name: Test the React application
+        run: mise run test:gui
+      - name: Build the packaged application
+        run: mise run build:dev
+      - name: Test original camera fixtures
+        if: github.event_name != 'pull_request'
+        run: mise run test:fixtures
+
+  browser:
+    name: Browser Journey
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Install the pinned toolchain
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4
+        with:
+          version: 2026.6.14
+          cache: true
+      - name: Install locked dependencies
+        run: mise run sync
+      - name: Install Chromium
+        run: mise run browser:install
+      - name: Run the analysis and report journey
+        run: mise run test:gui:e2e
