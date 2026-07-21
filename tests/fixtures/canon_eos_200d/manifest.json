@@ -44,34 +44,10 @@
       "height_px": 4000
     },
     {
-      "name": "IMG_0151.CR2",
-      "kind": "raw",
-      "bytes": 26124233,
-      "sha256": "2c95bcdeae82524a4c573689c8839c3edde3a976d71afc5ed411d4a74e260879",
-      "width_px": 6024,
-      "height_px": 4020
-    },
-    {
       "name": "IMG_0152.CR2",
       "kind": "raw",
       "bytes": 25563270,
       "sha256": "aeb55e4a816c84dd2736c5799491beb63dc1ed138be30ea5619174ee10ddb3f8",
-      "width_px": 6024,
-      "height_px": 4020
-    },
-    {
-      "name": "IMG_0157.CR2",
-      "kind": "raw",
-      "bytes": 30872261,
-      "sha256": "73c78d578a01c172a571f17754ad85660216ae13b8b9978eecffb1e8a4e222a9",
-      "width_px": 6024,
-      "height_px": 4020
-    },
-    {
-      "name": "IMG_0158.CR2",
-      "kind": "raw",
-      "bytes": 30241933,
-      "sha256": "b0477590d80a2f2c6b4ecaa74bef91e21b6df82683fc48629cce3e63c556b2c7",
       "width_px": 6024,
       "height_px": 4020
     }

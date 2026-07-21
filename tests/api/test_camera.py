@@ -28,22 +28,11 @@ CAMERA_REGIONS = {
             "height": 0.14,
         },
     },
-    "IMG_0158": {
-        "target": {"type": "rectangle", "x": 0.42, "y": 0.74, "width": 0.14, "height": 0.18},
-        "local_background": {
-            "type": "polygon",
-            "points": [[0.25, 0.66], [0.70, 0.66], [0.70, 0.95], [0.25, 0.95]],
-        },
-        "bright_background": {
-            "type": "polygon",
-            "points": [[0.22, 0.03], [0.80, 0.03], [0.80, 0.55], [0.22, 0.55]],
-        },
-    },
 }
 
 
 @pytest.mark.camera_fixture
-@pytest.mark.parametrize("name", ["IMG_0152", "IMG_0158"])
+@pytest.mark.parametrize("name", ["IMG_0152"])
 def test_analysis(name: str) -> None:
     image = FIXTURE_DIR / f"{name}.CR2"
     with image.open("rb") as stream:

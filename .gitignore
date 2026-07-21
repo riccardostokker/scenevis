@@ -22,6 +22,11 @@ __pycache__/
 /app/test-results/
 *.tsbuildinfo
 
+# Location-sensitive camera originals
+/tests/fixtures/canon_eos_200d/IMG_0151.CR2
+/tests/fixtures/canon_eos_200d/IMG_0157.CR2
+/tests/fixtures/canon_eos_200d/IMG_0158.CR2
+
 # Local configuration and secrets
 .env
 .env.*
