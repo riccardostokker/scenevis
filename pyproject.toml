@@ -37,5 +37,8 @@ src = ["src", "tests", "scripts"]
 select = ["E", "F", "I", "UP", "B", "C4", "SIM", "T10", "RUF"]
 
 [tool.pytest.ini_options]
-addopts = "-ra --strict-config --strict-markers"
+addopts = "-ra --strict-config --strict-markers -m 'not camera_fixture'"
 testpaths = ["tests"]
+markers = [
+    "camera_fixture: exercises original full-resolution camera files",
+]

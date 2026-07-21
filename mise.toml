@@ -46,6 +46,10 @@ run = "uv run --no-sync ty check src tests scripts"
 description = "Run Python tests."
 run = "uv run --no-sync pytest"
 
+[tasks."test:fixtures"]
+description = "Run full-resolution Canon camera fixture tests."
+run = "uv run --no-sync pytest -m camera_fixture"
+
 [tasks.check]
 description = "Run the fast read-only validation aggregate."
 depends = ["version:check", "format", "lint", "typecheck"]

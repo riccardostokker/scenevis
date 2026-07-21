@@ -61,6 +61,17 @@ mise run python:release
 `check` is read-only and intentionally excludes tests. `version:release` is the explicit
 mutating release workflow driven by Conventional Commits and git-cliff.
 
+Full-resolution Canon EOS 200D fixtures live under `tests/fixtures/canon_eos_200d/`. The normal
+suite skips their slower decode pass; run the original-file integration coverage explicitly:
+
+```sh
+mise run test:fixtures
+```
+
+The fixture manifest records source provenance, exact byte sizes, dimensions, and SHA-256 hashes.
+The originals are intentionally exempted only from prek's generic 1 MB file limit; all other
+large files remain rejected.
+
 ## Analyze a scene
 
 Create a YAML region file like [examples/corridor.rois.yaml](examples/corridor.rois.yaml), then

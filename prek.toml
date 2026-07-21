@@ -4,7 +4,7 @@ default_stages = ["pre-commit"]
 [[repos]]
 repo = "builtin"
 hooks = [
-    { id = "check-added-large-files", args = ["--maxkb=1024"] },
+    { id = "check-added-large-files", args = ["--maxkb=1024"], exclude = '^tests/fixtures/canon_eos_200d/.*\.(?:CR2|JPG)$' },
     { id = "check-case-conflict" },
     { id = "check-json" },
     { id = "check-merge-conflict" },

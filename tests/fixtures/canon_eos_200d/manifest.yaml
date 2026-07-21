@@ -1,0 +1,59 @@
+version: 1
+camera_model: Canon EOS 200D
+source: gphoto2://Canon_Inc._Canon_Digital_Camera/DCIM/100CANON
+
+files:
+  - name: IMG_0013.JPG
+    kind: raster
+    bytes: 8160876
+    sha256: 72bc619bac4bec0a3b842bc216b08de77c2afb78a65f805de21ccadb07a47495
+    width_px: 6000
+    height_px: 4000
+  - name: IMG_0085.JPG
+    kind: raster
+    bytes: 4825117
+    sha256: 45235ce73345e60a5e8b64074b4678fe4c9986221865accd9119e5dfba9afb35
+    width_px: 6000
+    height_px: 4000
+  - name: IMG_0086.JPG
+    kind: raster
+    bytes: 5035314
+    sha256: dcaae503718e55688463db1feb573d739726107f471cfccf3de02f27ba8ef9bb
+    width_px: 6000
+    height_px: 4000
+  - name: IMG_0089.JPG
+    kind: raster
+    bytes: 5359788
+    sha256: cad7018d77074447d15356b9925cd95e62b9dcf45760c413478f4ccc3bf73606
+    width_px: 6000
+    height_px: 4000
+  - name: IMG_0108.JPG
+    kind: raster
+    bytes: 4099158
+    sha256: 5cba28eb58994b542e85837bf9a0aa15c6e7b1df3c0576129c987393951a282b
+    width_px: 6000
+    height_px: 4000
+  - name: IMG_0151.CR2
+    kind: raw
+    bytes: 26124233
+    sha256: 2c95bcdeae82524a4c573689c8839c3edde3a976d71afc5ed411d4a74e260879
+    width_px: 6024
+    height_px: 4020
+  - name: IMG_0152.CR2
+    kind: raw
+    bytes: 25563270
+    sha256: aeb55e4a816c84dd2736c5799491beb63dc1ed138be30ea5619174ee10ddb3f8
+    width_px: 6024
+    height_px: 4020
+  - name: IMG_0157.CR2
+    kind: raw
+    bytes: 30872261
+    sha256: 73c78d578a01c172a571f17754ad85660216ae13b8b9978eecffb1e8a4e222a9
+    width_px: 6024
+    height_px: 4020
+  - name: IMG_0158.CR2
+    kind: raw
+    bytes: 30241933
+    sha256: b0477590d80a2f2c6b4ecaa74bef91e21b6df82683fc48629cce3e63c556b2c7
+    width_px: 6024
+    height_px: 4020
