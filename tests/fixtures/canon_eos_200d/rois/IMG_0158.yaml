@@ -1,0 +1,26 @@
+version: 1
+scene_id: canon_0158_bright_sky
+
+regions:
+  target:
+    type: rectangle
+    x: 0.42
+    y: 0.74
+    width: 0.14
+    height: 0.18
+
+  local_background:
+    type: polygon
+    points:
+      - [0.25, 0.66]
+      - [0.70, 0.66]
+      - [0.70, 0.95]
+      - [0.25, 0.95]
+
+  bright_background:
+    type: polygon
+    points:
+      - [0.22, 0.03]
+      - [0.80, 0.03]
+      - [0.80, 0.55]
+      - [0.22, 0.55]

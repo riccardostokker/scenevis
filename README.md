@@ -72,6 +72,10 @@ The fixture manifest records source provenance, exact byte sizes, dimensions, an
 The originals are intentionally exempted only from prek's generic 1 MB file limit; all other
 large files remain rejected.
 
+Curated ROI documents for the indoor clipped-lamp scene and outdoor bright-sky scene live beside
+the originals under `tests/fixtures/canon_eos_200d/rois/`. The fixture suite runs both CR2 files
+through the complete analysis and PNG/JSON/CSV output path.
+
 ## Analyze a scene
 
 Create a YAML region file like [examples/corridor.rois.yaml](examples/corridor.rois.yaml), then
