@@ -1,8 +1,9 @@
-import { useState, type PointerEvent } from "react";
+import { useState, type PointerEvent, type ReactNode } from "react";
 
 import { appendPoint, polygon, rectangle } from "./drawing";
 import {
   DRAWING_MODE_LABELS,
+  REGION_COLORS,
   REGION_LABELS,
   REGION_NAMES,
   type DrawingMode,
@@ -19,15 +20,18 @@ type Props = {
   mode: DrawingMode;
   onActiveChange: (name: RegionName) => void;
   onSelect: (name: RegionName, region: Region) => void;
+  toolbar?: ReactNode;
 };
 
-const COLORS: Record<RegionName, string> = {
-  target: "#e3a43f",
-  local_background: "#78aaa2",
-  bright_background: "#d07782",
-};
-
-export function SceneCanvas({ image, selection, active, mode, onActiveChange, onSelect }: Props) {
+export function SceneCanvas({
+  image,
+  selection,
+  active,
+  mode,
+  onActiveChange,
+  onSelect,
+  toolbar,
+}: Props) {
   const [origin, setOrigin] = useState<Point | null>(null);
   const [cursor, setCursor] = useState<Point | null>(null);
   const [lassoPoints, setLassoPoints] = useState<Point[]>([]);
@@ -96,7 +100,7 @@ export function SceneCanvas({ image, selection, active, mode, onActiveChange, on
                 onActiveChange(name);
               }}
             >
-              <RegionShape region={region} color={COLORS[name]} active={name === active} />
+              <RegionShape region={region} name={name} active={name === active} />
             </g>
           );
         })}
@@ -108,32 +112,34 @@ export function SceneCanvas({ image, selection, active, mode, onActiveChange, on
             width={draftBox.width}
             height={draftBox.height}
             className="draft-region"
-            fill={`${COLORS[active]}28`}
-            stroke={COLORS[active]}
+            fill={`${REGION_COLORS[active]}28`}
+            stroke={REGION_COLORS[active]}
           />
         )}
         {draftLasso.length > 1 && (
           <polyline
             points={points(draftLasso)}
             className="draft-region"
-            fill={`${COLORS[active]}28`}
-            stroke={COLORS[active]}
+            fill={`${REGION_COLORS[active]}28`}
+            stroke={REGION_COLORS[active]}
           />
         )}
       </svg>
+      {toolbar}
     </div>
   );
 }
 
-function RegionShape({
+export function RegionShape({
   region,
-  color,
+  name,
   active,
 }: {
   region: Region;
-  color: string;
+  name: RegionName;
   active: boolean;
 }) {
+  const color = REGION_COLORS[name];
   return (
     <>
       <Geometry region={region} fill="none" stroke="#171511" strokeWidth={active ? 0.012 : 0.009} />

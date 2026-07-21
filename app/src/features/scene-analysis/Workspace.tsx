@@ -1,206 +1,180 @@
-import { useState } from "react";
+import { useReducer } from "react";
 
-import {
-  createAnalysis,
-  createPreview,
-  type Analysis,
-  type Preview,
-} from "../../shared/api/client";
+import { createAnalysis, createPreview } from "../../shared/api/client";
+import { ComparisonView } from "./ComparisonView";
+import { EmptyWorkspace } from "./EmptyWorkspace";
 import { downloadReport } from "./export";
 import { FileDropZone } from "./FileDropZone";
-import { MetricPanel } from "./MetricPanel";
+import { complete, REGION_NAMES, type Region, type RegionName, type Selection } from "./model";
+import { ScenarioEditor } from "./ScenarioEditor";
+import { ScenarioRail } from "./ScenarioRail";
 import {
-  complete,
-  REGION_NAMES,
-  type DrawingMode,
-  type Region,
-  type RegionName,
-  type Selection,
-} from "./model";
-import { SceneCanvas } from "./SceneCanvas";
-import { SelectionToolbar } from "./SelectionToolbar";
+  activeScenario,
+  completedScenarios,
+  createScenario,
+  INITIAL_WORKSPACE,
+  type Scenario,
+  workspaceReducer,
+} from "./scenarios";
 import { suggestions } from "./selection";
-
-type Activity = "idle" | "preview" | "analysis";
+import { useThemePreference } from "./ThemeControl";
+import { WorkspaceHeader } from "./WorkspaceHeader";
 
 export function Workspace() {
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<Preview | null>(null);
-  const [selection, setSelection] = useState<Selection>({});
-  const [active, setActive] = useState<RegionName>("target");
-  const [mode, setMode] = useState<DrawingMode>("box");
-  const [analysis, setAnalysis] = useState<Analysis | null>(null);
-  const [activity, setActivity] = useState<Activity>("idle");
-  const [error, setError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(workspaceReducer, INITIAL_WORKSPACE);
+  const [theme, setTheme] = useThemePreference();
+  const active = activeScenario(state);
+  const completed = completedScenarios(state);
+  const analyzable = state.scenarios.filter(
+    (scenario) =>
+      scenario.preview &&
+      complete(scenario.selection) &&
+      scenario.activity === null &&
+      scenario.analysis === null,
+  );
 
-  async function chooseImage(nextFile: File) {
-    setFile(nextFile);
-    setPreview(null);
-    setSelection({});
-    setAnalysis(null);
-    setActive("target");
-    setMode("box");
-    setError(null);
-    setActivity("preview");
-    try {
-      setPreview(await createPreview(nextFile));
-    } catch (caught) {
-      setError(message(caught));
-    } finally {
-      setActivity("idle");
-    }
+  async function addFiles(files: File[]) {
+    const scenarios = files.map((file) => createScenario(file, crypto.randomUUID()));
+    dispatch({ type: "scenariosAdded", scenarios });
+    await runPool(scenarios, 3, async (scenario) => {
+      try {
+        const preview = await createPreview(scenario.file);
+        dispatch({ type: "previewSucceeded", id: scenario.id, preview });
+      } catch (caught) {
+        dispatch({ type: "operationFailed", id: scenario.id, message: message(caught) });
+      }
+    });
   }
 
-  function selectRegion(name: RegionName, region: Region) {
-    setAnalysis(null);
-    if (name === "target" && preview) {
-      setSelection(suggestions(region, preview.bright_background_suggestion));
-      setActive("local_background");
+  function selectRegion(scenario: Scenario, name: RegionName, region: Region) {
+    if (!scenario.preview) return;
+    if (name === "target") {
+      dispatch({
+        type: "selectionChanged",
+        id: scenario.id,
+        selection: suggestions(region, scenario.preview.bright_background_suggestion),
+        activeRegion: "local_background",
+      });
       return;
     }
-    setSelection((current) => ({ ...current, [name]: region }));
-    const index = REGION_NAMES.indexOf(name);
-    const next = REGION_NAMES[index + 1];
-    if (next) setActive(next);
+    dispatch({
+      type: "selectionChanged",
+      id: scenario.id,
+      selection: { ...scenario.selection, [name]: region },
+      activeRegion: nextRegion(name),
+    });
   }
 
-  async function analyze() {
-    if (!file || !complete(selection)) return;
-    setError(null);
-    setActivity("analysis");
+  function clearRegion(scenario: Scenario, name: RegionName) {
+    const selection: Selection = name === "target" ? {} : { ...scenario.selection };
+    if (name !== "target") delete selection[name];
+    dispatch({
+      type: "selectionChanged",
+      id: scenario.id,
+      selection,
+      activeRegion: name,
+    });
+  }
+
+  function redetect(scenario: Scenario) {
+    const target = scenario.selection.target;
+    if (!target || !scenario.preview) return;
+    dispatch({
+      type: "selectionChanged",
+      id: scenario.id,
+      selection: suggestions(target, scenario.preview.bright_background_suggestion),
+      activeRegion: "local_background",
+    });
+  }
+
+  async function analyze(scenario: Scenario): Promise<boolean> {
+    if (!scenario.preview || !complete(scenario.selection)) return false;
+    dispatch({ type: "analysisRequested", id: scenario.id });
     try {
-      setAnalysis(await createAnalysis(file, selection));
+      const analysis = await createAnalysis(scenario.file, scenario.selection);
+      dispatch({ type: "analysisSucceeded", id: scenario.id, analysis });
+      return true;
     } catch (caught) {
-      setError(message(caught));
-    } finally {
-      setActivity("idle");
+      dispatch({ type: "operationFailed", id: scenario.id, message: message(caught) });
+      return false;
     }
+  }
+
+  async function analyzeAll() {
+    let succeeded = completed.length;
+    for (const scenario of analyzable) {
+      if (await analyze(scenario)) succeeded += 1;
+    }
+    if (succeeded > 0) dispatch({ type: "viewChanged", view: "compare" });
   }
 
   return (
-    <FileDropZone onFile={(nextFile) => void chooseImage(nextFile)}>
-      <header className="masthead">
-        <div>
-          <p className="eyebrow">Photographic Visibility Analysis</p>
-          <h1>Scenevis</h1>
-          <p className="lede">
-            Select the target and its context. Measurements stay grounded in linear source data.
-          </p>
-        </div>
-        <label className="file-control">
-          <span>{file ? "Choose Another Image" : "Choose Image"}</span>
-          <input
-            type="file"
-            accept=".cr2,.dng,.jpg,.jpeg,.png,.tif,.tiff,image/*"
-            onChange={(event) => {
-              const selected = event.target.files?.[0];
-              if (selected) void chooseImage(selected);
-            }}
-          />
-        </label>
-      </header>
+    <FileDropZone onFiles={(files) => void addFiles(files)}>
+      <div className="app-shell">
+        <WorkspaceHeader
+          view={state.view}
+          completedCount={completed.length}
+          analyzableCount={analyzable.length}
+          theme={theme}
+          onThemeChange={setTheme}
+          onViewChange={(view) => dispatch({ type: "viewChanged", view })}
+          onAnalyzeAll={() => void analyzeAll()}
+          onExport={() => downloadReport(completed)}
+        />
 
-      {error && (
-        <div className="error-message" role="alert">
-          {error}
-        </div>
-      )}
-
-      {!preview && (
-        <section className="empty-state">
-          <p className="eyebrow">Start Here</p>
-          <h2>{activity === "preview" ? "Preparing Preview…" : "Choose a RAW or Raster Image"}</h2>
-          <p>
-            The selected file remains in this browser session. The backend uses temporary storage
-            only while decoding and measuring it.
-          </p>
-        </section>
-      )}
-
-      {preview && (
-        <main className="workspace">
-          <section className="scene-column">
-            <div className="scene-heading">
-              <div>
-                <p className="eyebrow">
-                  {preview.processing.source === "raw" ? "RAW Source" : "Rendered Source"}
-                </p>
-                <h2>{preview.image}</h2>
-              </div>
-              <p>
-                {preview.width_px.toLocaleString()} × {preview.height_px.toLocaleString()} px
-              </p>
-            </div>
-
-            <SelectionToolbar
-              activeRegion={active}
-              mode={mode}
-              selection={selection}
-              onActiveRegionChange={setActive}
-              onModeChange={setMode}
-              onClear={() => {
-                setAnalysis(null);
-                setSelection((current) => {
-                  const next = { ...current };
-                  delete next[active];
-                  return next;
-                });
-              }}
+        {state.scenarios.length === 0 ? (
+          <EmptyWorkspace onFiles={(files) => void addFiles(files)} />
+        ) : (
+          <div className="workspace-layout">
+            <ScenarioRail
+              scenarios={state.scenarios}
+              activeId={state.activeId}
+              onActivate={(id) => dispatch({ type: "scenarioActivated", id })}
+              onRename={(id, name) => dispatch({ type: "scenarioRenamed", id, name })}
+              onRemove={(id) => dispatch({ type: "scenarioRemoved", id })}
+              onFiles={(files) => void addFiles(files)}
             />
 
-            <SceneCanvas
-              image={preview.preview_data_url}
-              selection={selection}
-              active={active}
-              mode={mode}
-              onActiveChange={setActive}
-              onSelect={selectRegion}
-            />
-          </section>
-
-          <aside className="side-column">
-            <section className="analysis-actions">
-              <p className="eyebrow">Workflow</p>
-              <h2>Measure the Target</h2>
-              <p>
-                Draw the target first. Scenevis detects both backgrounds automatically; use the
-                toolbar to inspect or refine any region.
-              </p>
-              <button
-                type="button"
-                className="primary-button"
-                disabled={!complete(selection) || activity !== "idle"}
-                onClick={() => void analyze()}
-              >
-                {activity === "analysis" ? "Analyzing…" : "Analyze Scene"}
-              </button>
-              {analysis && preview && (
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => downloadReport(preview, analysis)}
-                >
-                  Export Static HTML
-                </button>
-              )}
-            </section>
-
-            {analysis ? (
-              <MetricPanel analysis={analysis} />
+            {state.view === "compare" ? (
+              <ComparisonView scenarios={state.scenarios} />
             ) : (
-              <section className="metric-placeholder">
-                <p className="eyebrow">Metrics</p>
-                <h2>Results Appear Here</h2>
-                <p>Complete the three regions and analyze the scene to compare visibility.</p>
-              </section>
+              <ScenarioEditor
+                scenario={active}
+                onSelect={selectRegion}
+                onClear={clearRegion}
+                onRedetect={redetect}
+                onAnalyze={(scenario) => void analyze(scenario)}
+                dispatch={dispatch}
+              />
             )}
-          </aside>
-        </main>
-      )}
+          </div>
+        )}
+      </div>
     </FileDropZone>
   );
 }
 
+function nextRegion(name: RegionName): RegionName {
+  const next = REGION_NAMES[REGION_NAMES.indexOf(name) + 1];
+  return next ?? name;
+}
+
 function message(error: unknown): string {
   return error instanceof Error ? error.message : "The operation could not be completed.";
+}
+
+async function runPool<T>(
+  items: readonly T[],
+  concurrency: number,
+  run: (item: T) => Promise<void>,
+) {
+  let index = 0;
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+    while (index < items.length) {
+      const item = items[index];
+      index += 1;
+      if (item) await run(item);
+    }
+  });
+  await Promise.all(workers);
 }

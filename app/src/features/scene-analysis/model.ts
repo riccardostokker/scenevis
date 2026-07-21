@@ -20,6 +20,18 @@ export const REGION_LABELS: Record<RegionName, string> = {
   bright_background: "Bright Background",
 };
 
+export const REGION_DESCRIPTIONS: Record<RegionName, string> = {
+  target: "The subject whose visibility you want to measure.",
+  local_background: "The immediate context surrounding the target.",
+  bright_background: "A bright reference area used for dynamic-range comparisons.",
+};
+
+export const REGION_COLORS: Record<RegionName, string> = {
+  target: "#e3a43f",
+  local_background: "#58a69a",
+  bright_background: "#d07782",
+};
+
 export const DRAWING_MODES: DrawingMode[] = ["select", "box", "lasso"];
 
 export const DRAWING_MODE_LABELS: Record<DrawingMode, string> = {

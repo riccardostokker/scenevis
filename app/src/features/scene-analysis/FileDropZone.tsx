@@ -2,10 +2,10 @@ import { useEffect, useRef, useState, type DragEvent, type ReactNode } from "rea
 
 type Props = {
   children: ReactNode;
-  onFile: (file: File) => void;
+  onFiles: (files: File[]) => void;
 };
 
-export function FileDropZone({ children, onFile }: Props) {
+export function FileDropZone({ children, onFiles }: Props) {
   const dragDepth = useRef(0);
   const [active, setActive] = useState(false);
 
@@ -51,8 +51,8 @@ export function FileDropZone({ children, onFile }: Props) {
     event.preventDefault();
     dragDepth.current = 0;
     setActive(false);
-    const file = event.dataTransfer.files.item(0);
-    if (file) onFile(file);
+    const files = Array.from(event.dataTransfer.files);
+    if (files.length > 0) onFiles(files);
   }
 
   return (
@@ -69,8 +69,8 @@ export function FileDropZone({ children, onFile }: Props) {
       {active && (
         <div className="drop-overlay" role="status">
           <div>
-            <p className="eyebrow">Image Ready</p>
-            <strong>Drop Image Here</strong>
+            <p className="eyebrow">Add Scenarios</p>
+            <strong>Drop Images Here</strong>
           </div>
         </div>
       )}

@@ -14,6 +14,11 @@ export type Scenario = {
   error: string | null;
 };
 
+export type CompletedScenario = Scenario & {
+  preview: Preview;
+  analysis: Analysis;
+};
+
 export type WorkspaceView = "annotate" | "compare";
 
 export type WorkspaceState = {
@@ -140,8 +145,11 @@ export function activeScenario(state: WorkspaceState): Scenario | null {
   return state.scenarios.find((scenario) => scenario.id === state.activeId) ?? null;
 }
 
-export function completedScenarios(state: WorkspaceState): Scenario[] {
-  return state.scenarios.filter((scenario) => scenario.analysis !== null);
+export function completedScenarios(state: WorkspaceState): CompletedScenario[] {
+  return state.scenarios.filter(
+    (scenario): scenario is CompletedScenario =>
+      scenario.preview !== null && scenario.analysis !== null,
+  );
 }
 
 function update(

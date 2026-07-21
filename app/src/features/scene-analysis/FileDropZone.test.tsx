@@ -5,24 +5,24 @@ import { FileDropZone } from "./FileDropZone";
 
 describe("file drop zone", () => {
   it("accepts a file drop", () => {
-    const onFile = vi.fn();
+    const onFiles = vi.fn();
     const file = new File(["image"], "scene.jpg", { type: "image/jpeg" });
     const dataTransfer = transfer(file);
     render(
-      <FileDropZone onFile={onFile}>
+      <FileDropZone onFiles={onFiles}>
         <span>Workspace</span>
       </FileDropZone>,
     );
     const zone = screen.getByTestId("file-drop-zone");
 
     fireEvent.dragEnter(zone, { dataTransfer });
-    expect(screen.getByText("Drop Image Here")).toBeInTheDocument();
+    expect(screen.getByText("Drop Images Here")).toBeInTheDocument();
 
     fireEvent.dragOver(zone, { dataTransfer });
     fireEvent.drop(zone, { dataTransfer });
 
-    expect(onFile).toHaveBeenCalledWith(file);
-    expect(screen.queryByText("Drop Image Here")).not.toBeInTheDocument();
+    expect(onFiles).toHaveBeenCalledWith([file]);
+    expect(screen.queryByText("Drop Images Here")).not.toBeInTheDocument();
   });
 });
 

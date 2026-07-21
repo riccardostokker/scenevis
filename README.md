@@ -18,15 +18,17 @@ mise run dev
 
 Open <http://127.0.0.1:5173>, then:
 
-1. Drop or choose a RAW or raster image.
-2. Select **Target**, then draw it with the **Box** or **Lasso** tool.
-3. Review the detected **Local Background** and **Bright Background** regions. Use **Select**,
+1. Drop or choose one or more RAW or raster images.
+2. Rename each scenario in the location rail when the filename is not descriptive enough.
+3. Select **Target**, then draw it with the floating **Box** or **Lasso** tool.
+4. Review the detected **Local Background** and **Bright Background** regions. Use **Select**,
    **Box**, or **Lasso** to inspect or refine them.
-4. Select **Analyze Scene**.
-5. Select **Export Static HTML** to save a self-contained report.
+5. Analyze scenarios individually or select **Analyze All** when every target is ready.
+6. Open **Compare** to review aligned KPIs, then select **Export Report**.
 
-The HTML artifact embeds a compressed display preview, the validated zones, warnings, ordered KPI
-values, and their descriptions. It contains no external assets or executable scripts.
+The HTML artifact embeds a compressed display preview and validated zones for every completed
+scenario, an aligned comparison table, warnings, ordered KPI values, and their descriptions. It
+contains no external assets or executable scripts.
 
 Build the frontend into the Python package and run the single-word CLI:
 
@@ -67,7 +69,8 @@ scenevis/
 ├── app/                              React 19 and Vite 8 application
 │   └── src/
 │       ├── app/                      application composition
-│       ├── features/scene-analysis/ region editing, KPIs, and HTML export
+│       ├── components/ui/            shadcn UI primitives
+│       ├── features/scene-analysis/ scenario state, region editing, KPIs, and reports
 │       └── shared/api/               generated contract types and client
 ├── src/scenevis/
 │   ├── scene/                        image loading and normalized regions
