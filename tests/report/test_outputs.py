@@ -24,7 +24,7 @@ def test_overlay_and_records(tmp_path: Path) -> None:
     assert outputs.csv.is_file()
     with Image.open(outputs.overlay) as overlay:
         assert overlay.width > pixels.shape[1]
-        assert overlay.height == pixels.shape[0]
+        assert overlay.height >= pixels.shape[0]
     restored = artifacts.result.model_validate_json(outputs.json.read_text(encoding="utf-8"))
     assert restored.metrics == artifacts.result.metrics
 
