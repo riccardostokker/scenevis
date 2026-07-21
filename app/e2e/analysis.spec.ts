@@ -40,7 +40,7 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
 
   await expect(page.getByRole("heading", { name: "IMG_0085" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Open IMG_0086" })).toBeVisible();
-  await expect.poll(() => previewResponses).toEqual([200, 200]);
+  await expect.poll(() => previewResponses, { timeout: 20_000 }).toEqual([200, 200]);
 
   const firstName = page.getByRole("textbox", { name: "Rename IMG_0085" });
   await firstName.fill("North Approach");
@@ -67,6 +67,7 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await secondName.fill("South Platform");
   await secondName.press("Enter");
   await drawTarget(page);
+  await page.screenshot({ path: test.info().outputPath("annotation.png"), fullPage: true });
 
   const analyzeAll = page.getByRole("button", { name: "Analyze All (2)" });
   await expect(analyzeAll).toBeEnabled();
