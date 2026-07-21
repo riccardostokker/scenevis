@@ -36,8 +36,11 @@ describe("static report", () => {
 
     expect(html).toContain("data:image/jpeg;base64,abc123");
     expect(html).toContain("Robust Contrast-to-Noise Ratio");
-    expect(html).toContain("Target</text>");
+    expect(html).toContain("Selected Zones");
+    expect(html).toContain('data-zone="target"');
     expect(html).toContain("<svg");
+    expect(html).not.toContain("<text");
+    expect(html).not.toContain("vector-effect");
     expect(html).not.toContain("<script");
   });
 });

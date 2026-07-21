@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 test("analyzes an image and exports a static report", async ({ page }) => {
   const consoleErrors: string[] = [];
@@ -49,14 +50,18 @@ test("analyzes an image and exports a static report", async ({ page }) => {
   await page.mouse.move(bounds.x + bounds.width * 0.52, bounds.y + bounds.height * 0.58);
   await page.mouse.up();
 
-  await page.getByRole("button", { name: "Local Background Empty" }).click();
+  await expect(page.getByRole("button", { name: "Local Background Box" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Bright Background Box" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Analyze Scene" })).toBeEnabled();
+
+  await page.getByRole("button", { name: "Local Background Box" }).click();
   await page.mouse.move(bounds.x + bounds.width * 0.28, bounds.y + bounds.height * 0.25);
   await page.mouse.down();
   await page.mouse.move(bounds.x + bounds.width * 0.6, bounds.y + bounds.height * 0.68);
   await page.mouse.up();
 
   await page.getByRole("button", { name: "Lasso", exact: true }).click();
-  await page.getByRole("button", { name: "Bright Background Empty" }).click();
+  await page.getByRole("button", { name: "Bright Background Box" }).click();
   await page.mouse.move(bounds.x + bounds.width * 0.72, bounds.y + bounds.height * 0.08);
   await page.mouse.down();
   await page.mouse.move(bounds.x + bounds.width * 0.9, bounds.y + bounds.height * 0.09);
@@ -82,8 +87,17 @@ test("analyzes an image and exports a static report", async ({ page }) => {
   expect(download.suggestedFilename()).toBe("IMG_0085.scenevis.html");
   expect(html).toContain("data:image/jpeg;base64,");
   expect(html).toContain("Robust Contrast-to-Noise Ratio");
-  expect(html).toContain("Target</text>");
+  expect(html).toContain("Selected Zones");
+  expect(html).not.toContain("<text");
   expect(html).not.toContain("<script");
+
+  const reportPage = await page.context().newPage();
+  await reportPage.goto(pathToFileURL(output).href);
+  await expect(reportPage.getByRole("heading", { name: "Selected Zones" })).toBeVisible();
+  expect(await reportPage.locator("svg text").count()).toBe(0);
+  await reportPage.screenshot({ path: test.info().outputPath("report.png"), fullPage: true });
+  await reportPage.close();
+
   expect(consoleErrors).toEqual([]);
   expect(requestFailures).toEqual([]);
   await page.screenshot({ path: test.info().outputPath("analysis.png"), fullPage: true });

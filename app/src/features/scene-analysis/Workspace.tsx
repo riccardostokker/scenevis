@@ -19,6 +19,7 @@ import {
 } from "./model";
 import { SceneCanvas } from "./SceneCanvas";
 import { SelectionToolbar } from "./SelectionToolbar";
+import { suggestions } from "./selection";
 
 type Activity = "idle" | "preview" | "analysis";
 
@@ -52,6 +53,11 @@ export function Workspace() {
 
   function selectRegion(name: RegionName, region: Region) {
     setAnalysis(null);
+    if (name === "target" && preview) {
+      setSelection(suggestions(region, preview.bright_background_suggestion));
+      setActive("local_background");
+      return;
+    }
     setSelection((current) => ({ ...current, [name]: region }));
     const index = REGION_NAMES.indexOf(name);
     const next = REGION_NAMES[index + 1];
@@ -157,8 +163,8 @@ export function Workspace() {
               <p className="eyebrow">Workflow</p>
               <h2>Measure the Target</h2>
               <p>
-                Choose a region and drawing tool, then mark the target and both backgrounds on the
-                canvas. Use Select to inspect an existing region.
+                Draw the target first. Scenevis detects both backgrounds automatically; use the
+                toolbar to inspect or refine any region.
               </p>
               <button
                 type="button"

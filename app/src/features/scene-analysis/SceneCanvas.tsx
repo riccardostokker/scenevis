@@ -97,7 +97,6 @@ export function SceneCanvas({ image, selection, active, mode, onActiveChange, on
               }}
             >
               <RegionShape region={region} color={COLORS[name]} active={name === active} />
-              <RegionLabel region={region} color={COLORS[name]} name={name} />
             </g>
           );
         })}
@@ -109,11 +108,17 @@ export function SceneCanvas({ image, selection, active, mode, onActiveChange, on
             width={draftBox.width}
             height={draftBox.height}
             className="draft-region"
+            fill={`${COLORS[active]}28`}
             stroke={COLORS[active]}
           />
         )}
         {draftLasso.length > 1 && (
-          <polyline points={points(draftLasso)} className="draft-region" stroke={COLORS[active]} />
+          <polyline
+            points={points(draftLasso)}
+            className="draft-region"
+            fill={`${COLORS[active]}28`}
+            stroke={COLORS[active]}
+          />
         )}
       </svg>
     </div>
@@ -129,30 +134,50 @@ function RegionShape({
   color: string;
   active: boolean;
 }) {
-  const shared = {
-    fill: `${color}18`,
-    stroke: color,
-    strokeWidth: active ? 0.006 : 0.004,
-    vectorEffect: "non-scaling-stroke" as const,
-  };
-  if (region.type === "polygon") return <polygon points={points(region.points)} {...shared} />;
-  return <rect x={region.x} y={region.y} width={region.width} height={region.height} {...shared} />;
+  return (
+    <>
+      <Geometry region={region} fill="none" stroke="#171511" strokeWidth={active ? 0.012 : 0.009} />
+      <Geometry
+        region={region}
+        fill={`${color}28`}
+        stroke={color}
+        strokeWidth={active ? 0.007 : 0.005}
+      />
+    </>
+  );
 }
 
-function RegionLabel({ region, color, name }: { region: Region; color: string; name: RegionName }) {
-  const [x, y] = region.type === "polygon" ? (region.points[0] ?? [0, 0]) : [region.x, region.y];
+function Geometry({
+  region,
+  fill,
+  stroke,
+  strokeWidth,
+}: {
+  region: Region;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}) {
+  if (region.type === "polygon") {
+    return (
+      <polygon
+        points={points(region.points)}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+      />
+    );
+  }
   return (
-    <text
-      x={x + 0.008}
-      y={y + 0.028}
-      fill={color}
-      fontSize={0.025}
-      stroke="#171511"
-      strokeWidth={0.004}
-      paintOrder="stroke"
-    >
-      {REGION_LABELS[name]}
-    </text>
+    <rect
+      x={region.x}
+      y={region.y}
+      width={region.width}
+      height={region.height}
+      fill={fill}
+      stroke={stroke}
+      strokeWidth={strokeWidth}
+    />
   );
 }
 

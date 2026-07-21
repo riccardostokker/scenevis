@@ -20,8 +20,8 @@ Open <http://127.0.0.1:5173>, then:
 
 1. Drop or choose a RAW or raster image.
 2. Select **Target**, then draw it with the **Box** or **Lasso** tool.
-3. Draw the **Local Background** and **Bright Background** regions the same way. Use **Select** to
-   inspect an existing region.
+3. Review the detected **Local Background** and **Bright Background** regions. Use **Select**,
+   **Box**, or **Lasso** to inspect or refine them.
 4. Select **Analyze Scene**.
 5. Select **Export Static HTML** to save a self-contained report.
 
