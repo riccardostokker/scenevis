@@ -14,8 +14,15 @@ COLORS = {
 }
 
 
-def save(*, preview: Image.Image, config: RoiConfig, result: Result, path: Path) -> None:
-    """Save a scene preview with ROI outlines, KPIs, and validity warnings."""
+def save(
+    *,
+    preview: Image.Image,
+    config: RoiConfig,
+    result: Result,
+    path: Path,
+    show_regions: bool = False,
+) -> None:
+    """Save a scene preview and KPI column, optionally including diagnostic ROI outlines."""
 
     scene = preview.convert("RGB").copy()
     scene.thumbnail((1600, 1200), Image.Resampling.LANCZOS)
@@ -29,19 +36,20 @@ def save(*, preview: Image.Image, config: RoiConfig, result: Result, path: Path)
     small = _font(18)
     title = _font(28)
 
-    regions: list[tuple[str, Region]] = [
-        ("target", config.regions.target),
-        ("local_background", config.regions.local_background),
-        ("bright_background", config.regions.bright_background),
-    ]
-    for name, region in regions:
-        points = vertices(region, width=scene.width, height=scene.height)
-        draw.line([*points, points[0]], fill=COLORS[name], width=5, joint="curve")
-        label = name.replace("_", " ")
-        origin = points[0]
-        box = draw.textbbox(origin, label, font=small, stroke_width=1)
-        draw.rectangle((box[0] - 4, box[1] - 2, box[2] + 4, box[3] + 2), fill="#101010")
-        draw.text(origin, label, font=small, fill=COLORS[name], stroke_width=1)
+    if show_regions:
+        regions: list[tuple[str, Region]] = [
+            ("target", config.regions.target),
+            ("local_background", config.regions.local_background),
+            ("bright_background", config.regions.bright_background),
+        ]
+        for name, region in regions:
+            points = vertices(region, width=scene.width, height=scene.height)
+            draw.line([*points, points[0]], fill=COLORS[name], width=5, joint="curve")
+            label = name.replace("_", " ")
+            origin = points[0]
+            box = draw.textbbox(origin, label, font=small, stroke_width=1)
+            draw.rectangle((box[0] - 4, box[1] - 2, box[2] + 4, box[3] + 2), fill="#101010")
+            draw.text(origin, label, font=small, fill=COLORS[name], stroke_width=1)
 
     x = scene.width + 28
     y = 28

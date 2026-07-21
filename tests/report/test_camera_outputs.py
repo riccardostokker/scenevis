@@ -32,6 +32,7 @@ def test_outputs(name: str, tmp_path: Path) -> None:
     assert math.isfinite(artifacts.result.metrics.dr_target_median_stops)
     assert outputs.json.is_file()
     assert outputs.csv.is_file()
-    with Image.open(outputs.overlay) as overlay:
-        assert overlay.width > 1600
-        assert overlay.height >= 1000
+    with Image.open(outputs.summary) as summary, Image.open(outputs.diagnostic) as diagnostic:
+        assert summary.width > 1600
+        assert summary.height >= 1000
+        assert summary.size == diagnostic.size

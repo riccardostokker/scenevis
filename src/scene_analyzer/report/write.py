@@ -14,7 +14,8 @@ from scene_analyzer.scene.roi import RoiConfig
 class Outputs:
     """Paths written for one analyzed scene."""
 
-    overlay: Path
+    summary: Path
+    diagnostic: Path
     json: Path
     csv: Path
 
@@ -26,16 +27,18 @@ def write(
     output_dir: Path,
     overwrite: bool = False,
 ) -> Outputs:
-    """Write an overlay PNG and consistent JSON/CSV result records."""
+    """Write clean and diagnostic PNGs plus consistent JSON/CSV result records."""
 
     output_dir.mkdir(parents=True, exist_ok=True)
     stem = artifacts.result.scene_id
     outputs = Outputs(
-        overlay=output_dir / f"{stem}.overlay.png",
+        summary=output_dir / f"{stem}.summary.png",
+        diagnostic=output_dir / f"{stem}.diagnostic.png",
         json=output_dir / f"{stem}.analysis.json",
         csv=output_dir / f"{stem}.analysis.csv",
     )
-    existing = [path for path in (outputs.overlay, outputs.json, outputs.csv) if path.exists()]
+    paths = (outputs.summary, outputs.diagnostic, outputs.json, outputs.csv)
+    existing = [path for path in paths if path.exists()]
     if existing and not overwrite:
         names = ", ".join(str(path) for path in existing)
         raise SceneAnalyzerError(f"output already exists: {names}; pass --overwrite to replace")
@@ -46,7 +49,14 @@ def write(
         preview=artifacts.preview,
         config=roi_config,
         result=artifacts.result,
-        path=outputs.overlay,
+        path=outputs.summary,
+    )
+    save_overlay(
+        preview=artifacts.preview,
+        config=roi_config,
+        result=artifacts.result,
+        path=outputs.diagnostic,
+        show_regions=True,
     )
     return outputs
 

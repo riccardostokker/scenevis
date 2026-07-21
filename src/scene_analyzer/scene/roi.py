@@ -82,6 +82,15 @@ def load_roi_config(path: Path) -> RoiConfig:
     return RoiConfig.model_validate(payload)
 
 
+def save_roi_config(config: RoiConfig, path: Path) -> None:
+    """Write a validated ROI document as human-readable YAML."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = config.model_dump(mode="json")
+    with path.open("w", encoding="utf-8") as stream:
+        yaml.safe_dump(payload, stream, sort_keys=False)
+
+
 def masks(config: RoiConfig, *, width: int, height: int) -> dict[RegionName, BoolMask]:
     """Rasterize configured regions and exclude target pixels from local background."""
 

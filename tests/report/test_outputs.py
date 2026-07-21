@@ -8,7 +8,7 @@ from scene_analyzer.report import write
 from scene_analyzer.scene.roi import RoiConfig
 
 
-def test_overlay_and_records(tmp_path: Path) -> None:
+def test_summary_diagnostic_and_records(tmp_path: Path) -> None:
     pixels = np.full((100, 120, 3), 32, dtype=np.uint8)
     pixels[20:50, 20:45] = 48
     pixels[10:90, 75:115] = 220
@@ -19,12 +19,15 @@ def test_overlay_and_records(tmp_path: Path) -> None:
     artifacts = analyze_with_artifacts(image_path=image_path, roi_config=config)
     outputs = write(artifacts=artifacts, roi_config=config, output_dir=tmp_path / "results")
 
-    assert outputs.overlay.is_file()
+    assert outputs.summary.is_file()
+    assert outputs.diagnostic.is_file()
     assert outputs.json.is_file()
     assert outputs.csv.is_file()
-    with Image.open(outputs.overlay) as overlay:
-        assert overlay.width > pixels.shape[1]
-        assert overlay.height >= pixels.shape[0]
+    with Image.open(outputs.summary) as summary, Image.open(outputs.diagnostic) as diagnostic:
+        assert summary.width > pixels.shape[1]
+        assert summary.height >= pixels.shape[0]
+        assert summary.size == diagnostic.size
+        assert summary.tobytes() != diagnostic.tobytes()
     restored = artifacts.result.model_validate_json(outputs.json.read_text(encoding="utf-8"))
     assert restored.metrics == artifacts.result.metrics
 
