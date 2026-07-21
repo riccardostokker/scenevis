@@ -75,7 +75,7 @@ def save(*, preview: Image.Image, config: RoiConfig, result: Result, path: Path)
     for warning in result.warnings:
         y = _wrapped_text(
             draw,
-            text=f"• {warning}",
+            text=f"- {warning}",
             x=x,
             y=y,
             width=panel_width - 56,
