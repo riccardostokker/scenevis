@@ -26,6 +26,13 @@ export const REGION_DESCRIPTIONS: Record<RegionName, string> = {
   bright_background: "A bright reference area used for dynamic-range comparisons.",
 };
 
+export const REGION_AUTO_SELECTION_DESCRIPTIONS: Partial<Record<RegionName, string>> = {
+  local_background:
+    "Expands the target bounds to 2.5× their width and height, centered on the target and kept inside the image. Target pixels are excluded when measured.",
+  bright_background:
+    "Finds the 15%-wide by 15%-high box with the highest average brightness in the preview.",
+};
+
 export const REGION_COLORS: Record<RegionName, string> = {
   target: "#e3a43f",
   local_background: "#58a69a",

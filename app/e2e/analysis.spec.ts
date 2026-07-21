@@ -53,8 +53,13 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   );
   await expect(page.locator(".selection-toolbar")).toBeVisible();
   await drawTarget(page);
-  await expect(page.getByRole("button", { name: /^2 Local Background/ })).toContainText("Box");
-  await expect(page.getByRole("button", { name: /^3 Bright Background/ })).toContainText("Box");
+  const localBackground = page.getByRole("button", { name: /^2 Local Background/ });
+  const brightBackground = page.getByRole("button", { name: /^3 Bright Background/ });
+  await expect(localBackground).toContainText("2.5× their width and height");
+  await expect(localBackground).toContainText("Target pixels are excluded when measured");
+  await expect(localBackground).toContainText("Box");
+  await expect(brightBackground).toContainText("15%-wide by 15%-high box");
+  await expect(brightBackground).toContainText("Box");
 
   await page.getByRole("button", { name: "Open IMG_0086" }).click();
   await expect(page.getByRole("heading", { name: "IMG_0086" })).toBeVisible();

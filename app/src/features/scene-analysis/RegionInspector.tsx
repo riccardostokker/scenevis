@@ -1,4 +1,5 @@
 import {
+  REGION_AUTO_SELECTION_DESCRIPTIONS,
   REGION_COLORS,
   REGION_DESCRIPTIONS,
   REGION_LABELS,
@@ -109,6 +110,7 @@ function RegionControl({
   onClear: () => void;
 }) {
   const region = selection[name];
+  const autoSelection = REGION_AUTO_SELECTION_DESCRIPTIONS[name];
   return (
     <div className={`region-control${active ? " active" : ""}`}>
       <button type="button" className="region-select" aria-pressed={active} onClick={onActivate}>
@@ -119,6 +121,11 @@ function RegionControl({
             {REGION_LABELS[name]}
           </strong>
           <small>{REGION_DESCRIPTIONS[name]}</small>
+          {autoSelection && (
+            <small className="region-auto-selection">
+              <span>Auto-selection:</span> {autoSelection}
+            </small>
+          )}
         </span>
         <Badge variant="outline" className={`region-state${region ? " complete" : ""}`}>
           {region ? (region.type === "polygon" ? "Lasso" : "Box") : "Empty"}

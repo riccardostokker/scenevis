@@ -811,6 +811,15 @@ p {
   line-height: 1.35;
 }
 
+.region-copy .region-auto-selection {
+  margin-top: 7px;
+}
+
+.region-auto-selection span {
+  color: var(--foreground);
+  font-weight: 650;
+}
+
 .region-state {
   align-self: start;
   color: var(--muted-foreground);
