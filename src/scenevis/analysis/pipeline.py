@@ -7,6 +7,7 @@ import numpy as np
 
 from scenevis.analysis.metrics import primary_metrics, statistics
 from scenevis.analysis.model import Metrics, Options, RegionStatistics, Result
+from scenevis.analysis.quality import analyze_quality
 from scenevis.error import ScenevisError
 from scenevis.scene.load import load
 from scenevis.scene.model import BoolMask, ImageMetadata, Loaded
@@ -71,6 +72,13 @@ def analyze_loaded(
         bright=bright,
         options=policy,
     )
+    quality = analyze_quality(
+        linear_rgb=loaded.linear_rgb,
+        source_luminance=luminance,
+        regions=regions,
+        file_format=loaded.metadata.summary.file_format,
+        options=policy,
+    )
     warnings = _warnings(
         image_name=image_name,
         regions=regions,
@@ -89,6 +97,7 @@ def analyze_loaded(
         processing=loaded.processing,
         region_statistics=region_statistics,
         metrics=metrics,
+        quality=quality,
         warnings=warnings,
     )
     return result

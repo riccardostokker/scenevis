@@ -19,6 +19,10 @@ class Options(BaseModel):
     minimum_region_pixels: int = Field(default=100, ge=1)
     overlap_warning_fraction: float = Field(default=0.25, ge=0.0, le=1.0)
     nonuniform_cv_threshold: float = Field(default=1.0, gt=0.0)
+    quality_max_dimension: int = Field(default=1600, ge=256)
+    focus_map_columns: int = Field(default=12, ge=2, le=32)
+    focus_map_rows: int = Field(default=8, ge=2, le=32)
+    focus_relative_threshold: float = Field(default=0.5, gt=0.0, le=1.0)
 
 
 class RegionStatistics(BaseModel):
@@ -75,18 +79,68 @@ class Metrics(BaseModel):
     image_clipped_99_percent: float
 
 
+class QualityMetrics(BaseModel):
+    """Transparent capture-quality measurements derived from linear source samples."""
+
+    model_config = ConfigDict(frozen=True)
+
+    target_sharpness: float
+    target_edge_acutance: float | None
+    target_edge_width_px: float | None
+    target_in_focus_coverage: float | None
+    target_sharpness_consistency: float | None
+    directional_blur_anisotropy: float | None
+    directional_blur_angle_degrees: float | None
+    luminance_noise: float | None
+    chroma_noise: float | None
+    detail_to_noise_ratio: float | None
+    jpeg_blockiness: float | None
+    ringing_halo_strength: float | None
+    banding_fraction: float | None
+    channel_saturation_clipping: float
+    center_to_corner_falloff: float | None
+
+
+class FocusTile(BaseModel):
+    """One normalized target tile in the local sharpness map."""
+
+    model_config = ConfigDict(frozen=True)
+
+    x: float = Field(ge=0.0, le=1.0)
+    y: float = Field(ge=0.0, le=1.0)
+    width: float = Field(gt=0.0, le=1.0)
+    height: float = Field(gt=0.0, le=1.0)
+    sharpness: float = Field(ge=0.0)
+    relative_sharpness: float = Field(ge=0.0, le=1.0)
+    in_focus: bool
+
+
+class QualityAnalysis(BaseModel):
+    """Quality KPIs and bounded diagnostics calculated at a reproducible scale."""
+
+    model_config = ConfigDict(frozen=True)
+
+    analysis_width_px: int = Field(ge=1)
+    analysis_height_px: int = Field(ge=1)
+    focus_relative_threshold: float = Field(gt=0.0, le=1.0)
+    metrics: QualityMetrics
+    focus_map: list[FocusTile]
+    warnings: list[str]
+
+
 class Result(BaseModel):
     """Versioned, serializable result for one analyzed scene."""
 
     model_config = ConfigDict(frozen=True)
 
-    version: int = 2
+    version: int = 3
     scene_id: str
     image: str
     metadata: ImageMetadata
     processing: Processing
     region_statistics: dict[str, RegionStatistics]
     metrics: Metrics
+    quality: QualityAnalysis
     warnings: list[str]
     preview_notice: str = (
         "Preview brightness has been adjusted. Metrics were calculated from linear source data."

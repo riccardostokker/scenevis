@@ -41,9 +41,12 @@ def test_preview_and_analysis() -> None:
     assert analysis_response.status_code == 200
     assert analysis["result"]["scene_id"] == "scene"
     assert analysis["result"]["image"] == "scene.png"
-    assert analysis["result"]["version"] == 2
+    assert analysis["result"]["version"] == 3
     assert analysis["result"]["metadata"]["summary"]["file_format"] == "png"
     assert analysis["result"]["metrics"]["cnr_robust"] > 0
+    assert analysis["result"]["quality"]["metrics"]["target_sharpness"] >= 0
+    assert analysis["result"]["quality"]["analysis_width_px"] == 120
+    assert analysis["result"]["quality"]["focus_map"]
     assert analysis["regions"] == _regions().model_dump(mode="json")
 
 
