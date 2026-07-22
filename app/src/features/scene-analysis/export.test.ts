@@ -20,12 +20,28 @@ describe("comparison report", () => {
     expect(html).toContain("data:image/jpeg;base64,abc123");
     expect(html).toContain("data:image/jpeg;base64,xyz789");
     expect(html).toContain("Robust Contrast-to-Noise Ratio");
+    expect(html).toContain("Camera Settings");
+    expect(html).toContain("1/125 s");
+    expect(html).toContain("Sensitive source fields and original filenames are excluded.");
+    expect(html).not.toContain("CAMERA-123");
+    expect(html).not.toContain("2026-07-21 18:42:00");
     expect(html).toContain('data-zone="target"');
     expect(html).toContain('stroke-width="1.6"');
     expect(html).toContain('stroke-linejoin="round"');
     expect(html).toContain('vector-effect="non-scaling-stroke"');
     expect(html).not.toContain("<text");
     expect(html).not.toContain("<script");
+  });
+
+  it("includes sensitive metadata only when requested", () => {
+    const scenario = reportScenario("North Atrium", "private-name.jpg", "abc123", 3.4);
+
+    const html = buildReport([scenario], { includeSensitiveMetadata: true });
+
+    expect(html).toContain("private-name.jpg");
+    expect(html).toContain("CAMERA-123");
+    expect(html).toContain("2026-07-21 18:42:00");
+    expect(html).toContain("Sensitive source fields are included in this artifact.");
   });
 });
 
@@ -37,6 +53,42 @@ function reportScenario(
 ): CompletedScenario {
   const preview = {
     preview_data_url: `data:image/jpeg;base64,${image}`,
+    metadata: {
+      version: 1,
+      entries_truncated: false,
+      summary: {
+        file_format: "jpg",
+        file_size_bytes: 2_048_000,
+        width_px: 6000,
+        height_px: 4000,
+        camera_make: "Canon",
+        camera_model: "EOS 200D",
+        aperture_f_number: 2.8,
+        exposure_time_seconds: 1 / 125,
+        iso: 400,
+        focal_length_mm: 50,
+        exposure_value_ev100: 9.94,
+        captured_at: "2026-07-21 18:42:00",
+      },
+      entries: [
+        {
+          key: "EXIF BodySerialNumber",
+          label: "Body Serial Number",
+          group: "exif",
+          value: "CAMERA-123",
+          sensitive: true,
+          truncated: false,
+        },
+        {
+          key: "EXIF FNumber",
+          label: "F Number",
+          group: "exif",
+          value: "2.8",
+          sensitive: false,
+          truncated: false,
+        },
+      ],
+    },
   } as Preview;
   const analysis = {
     regions: {

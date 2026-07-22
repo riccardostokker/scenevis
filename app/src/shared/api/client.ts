@@ -3,6 +3,9 @@ import type { components } from "./schema";
 export type Preview = components["schemas"]["Preview"];
 export type Analysis = components["schemas"]["Analysis"];
 export type Problem = components["schemas"]["Problem"];
+export type CaptureMetadata = components["schemas"]["CaptureMetadata"];
+export type ImageMetadata = components["schemas"]["ImageMetadata"];
+export type MetadataEntry = components["schemas"]["MetadataEntry"];
 
 export async function createPreview(file: File): Promise<Preview> {
   const form = new FormData();

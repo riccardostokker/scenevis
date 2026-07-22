@@ -1,9 +1,9 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 
 import { createAnalysis, createPreview } from "../../shared/api/client";
 import { ComparisonView } from "./ComparisonView";
 import { EmptyWorkspace } from "./EmptyWorkspace";
-import { downloadReport } from "./export";
+import { downloadReport, type ExportPrivacy } from "./export";
 import { FileDropZone } from "./FileDropZone";
 import { complete, REGION_NAMES, type Region, type RegionName, type Selection } from "./model";
 import { ScenarioEditor } from "./ScenarioEditor";
@@ -23,6 +23,7 @@ import { WorkspaceHeader } from "./WorkspaceHeader";
 export function Workspace() {
   const [state, dispatch] = useReducer(workspaceReducer, INITIAL_WORKSPACE);
   const [theme, setTheme] = useThemePreference();
+  const [exportPrivacy, setExportPrivacy] = useState<ExportPrivacy>("safe");
   const active = activeScenario(state);
   const completed = completedScenarios(state);
   const analyzable = state.scenarios.filter(
@@ -119,7 +120,11 @@ export function Workspace() {
           onThemeChange={setTheme}
           onViewChange={(view) => dispatch({ type: "viewChanged", view })}
           onAnalyzeAll={() => void analyzeAll()}
-          onExport={() => downloadReport(completed)}
+          exportPrivacy={exportPrivacy}
+          onExportPrivacyChange={setExportPrivacy}
+          onExport={() =>
+            downloadReport(completed, { includeSensitiveMetadata: exportPrivacy === "all" })
+          }
         />
 
         {state.scenarios.length === 0 ? (

@@ -1,7 +1,13 @@
 import { formatMetric, METRICS } from "./metrics";
+import {
+  CAPTURE_CARD_FIELDS,
+  CAPTURE_COMPARISON_FIELDS,
+  metadataValue,
+  mismatchFields,
+} from "./metadata";
 import { REGION_NAMES } from "./model";
 import { RegionShape } from "./SceneCanvas";
-import type { Scenario } from "./scenarios";
+import type { CompletedScenario, Scenario } from "./scenarios";
 import {
   Table,
   TableBody,
@@ -13,10 +19,13 @@ import {
 
 export function ComparisonView({ scenarios }: { scenarios: Scenario[] }) {
   const completed = scenarios.filter(
-    (scenario): scenario is Scenario & { analysis: NonNullable<Scenario["analysis"]> } =>
-      scenario.analysis !== null,
+    (scenario): scenario is CompletedScenario =>
+      scenario.preview !== null && scenario.analysis !== null,
   );
   const headlineMetrics = METRICS.slice(0, 4);
+  const captureMismatches = mismatchFields(
+    completed.map((scenario) => scenario.preview.metadata.summary),
+  );
 
   if (completed.length === 0) {
     return (
@@ -42,6 +51,56 @@ export function ComparisonView({ scenarios }: { scenarios: Scenario[] }) {
           </p>
         </div>
       </header>
+
+      <section className="capture-comparison-section" aria-labelledby="capture-table-heading">
+        <div className="section-heading comparison-section-heading">
+          <div>
+            <p className="eyebrow">Capture Consistency</p>
+            <h2 id="capture-table-heading">Camera Settings</h2>
+            <p className="comparison-section-description">
+              Metadata is reported by each image and does not affect visibility measurements.
+            </p>
+          </div>
+          <span
+            className={captureMismatches.size > 0 ? "difference-count active" : "difference-count"}
+          >
+            {captureMismatches.size} {captureMismatches.size === 1 ? "Difference" : "Differences"}
+          </span>
+        </div>
+        <div className="comparison-table-wrap">
+          <Table className="comparison-table capture-comparison-table">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Scenario</TableHead>
+                {CAPTURE_COMPARISON_FIELDS.map((field) => (
+                  <TableHead key={field.key} title={field.description}>
+                    {field.title}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {completed.map((scenario) => (
+                <TableRow key={scenario.id}>
+                  <TableCell className="scenario-name-cell">{scenario.name}</TableCell>
+                  {CAPTURE_COMPARISON_FIELDS.map((field) => {
+                    const differs = captureMismatches.has(field.key);
+                    return (
+                      <TableCell
+                        key={field.key}
+                        className={differs ? "metadata-differs" : undefined}
+                        title={differs ? `${field.title} differs between scenarios` : undefined}
+                      >
+                        {metadataValue(field, scenario.preview.metadata.summary) ?? "Not Reported"}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </section>
 
       <section className="comparison-table-section" aria-labelledby="comparison-table-heading">
         <div className="section-heading">
@@ -101,14 +160,28 @@ export function ComparisonView({ scenarios }: { scenarios: Scenario[] }) {
                 <p className="eyebrow">Scenario</p>
                 <h2>{scenario.name}</h2>
               </div>
-              <dl>
-                {headlineMetrics.slice(0, 3).map((metric) => (
-                  <div key={metric.key}>
-                    <dt>{metric.title}</dt>
-                    <dd>{formatMetric(metric, scenario.analysis.result.metrics[metric.key])}</dd>
-                  </div>
-                ))}
-              </dl>
+              <div className="comparison-card-facts">
+                <p className="eyebrow">Capture</p>
+                <dl>
+                  {CAPTURE_CARD_FIELDS.map((field) => (
+                    <div key={field.key}>
+                      <dt>{field.title}</dt>
+                      <dd>
+                        {metadataValue(field, scenario.preview.metadata.summary) ?? "Not Reported"}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="eyebrow metric-eyebrow">Visibility</p>
+                <dl>
+                  {headlineMetrics.slice(0, 3).map((metric) => (
+                    <div key={metric.key}>
+                      <dt>{metric.title}</dt>
+                      <dd>{formatMetric(metric, scenario.analysis.result.metrics[metric.key])}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
             </div>
           </article>
         ))}

@@ -1,5 +1,6 @@
 import type { Dispatch } from "react";
 
+import { MetadataPanel } from "./MetadataPanel";
 import { MetricPanel } from "./MetricPanel";
 import { REGION_NAMES, type Region, type RegionName } from "./model";
 import { RegionInspector } from "./RegionInspector";
@@ -94,6 +95,7 @@ export function ScenarioEditor({
             onRedetect={() => onRedetect(scenario)}
             onAnalyze={() => onAnalyze(scenario)}
           />
+          <MetadataPanel metadata={scenario.preview.metadata} />
           {scenario.analysis && <MetricPanel analysis={scenario.analysis} />}
         </div>
       </div>

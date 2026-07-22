@@ -74,9 +74,15 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await analyzeAll.click();
 
   await expect(page.getByRole("heading", { name: "Location Study" })).toBeVisible();
-  await expect(page.getByRole("cell", { name: "North Approach" })).toBeVisible();
-  await expect(page.getByRole("cell", { name: "South Platform" })).toBeVisible();
+  const measurementTable = page.getByLabel("Key Measurements");
+  await expect(measurementTable.getByRole("cell", { name: "North Approach" })).toBeVisible();
+  await expect(measurementTable.getByRole("cell", { name: "South Platform" })).toBeVisible();
   await expect(page.getByText("2 of 2 scenarios analyzed")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Camera Settings" })).toBeVisible();
+  await expect(page.locator(".difference-count")).toContainText(/\d+ Difference/);
+  await expect(page.getByRole("combobox", { name: "Report Metadata" })).toContainText(
+    "Safe Metadata",
+  );
 
   await theme.click();
   await page.getByRole("option", { name: "Dark" }).click();
@@ -97,6 +103,9 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   expect(html).toContain("North Approach");
   expect(html).toContain("South Platform");
   expect(html).toContain("Key Measurements");
+  expect(html).toContain("Camera Settings");
+  expect(html).toContain("Sensitive source fields and original filenames are excluded.");
+  expect(html).not.toContain("IMG_0085.JPG");
   expect(html).toContain('data-zone="target"');
   expect(html).not.toContain("<text");
   expect(html).not.toContain("<script");

@@ -35,8 +35,11 @@ compare the resulting measurements. No YAML sidecars or project files are requir
 - Supports box and freehand lasso selection with editable SVG regions.
 - Suggests local and bright reference regions as soon as the target is drawn.
 - Calculates eight ordered target-visibility measurements from linear source data.
+- Extracts normalized camera settings and bounded source metadata from RAW and raster images.
+- Highlights aperture, shutter, ISO, focal-length, EV100, and camera mismatches across scenarios.
 - Compares completed scenarios in aligned frames and a summary table.
-- Exports a self-contained HTML report with compressed images, zones, warnings, and KPI notes.
+- Exports a self-contained HTML report with compressed images, zones, metadata, warnings, and KPI
+  notes.
 - Supports light, dark, and system themes from desktop down to narrow screens.
 
 ## Quick Start
@@ -96,8 +99,15 @@ pass/fail thresholds: acceptable visibility depends on the scene, display, task,
 
 The exported HTML report embeds a compressed display preview and validated zones for every
 completed scenario. It also contains an aligned comparison table, ordered KPI values, their
-plain-language descriptions, and measurement warnings. The artifact has no external assets or
-executable scripts, so it can be opened and shared as a single file.
+plain-language descriptions, camera-setting comparisons, source metadata, and measurement
+warnings. The artifact has no external assets or executable scripts, so it can be opened and
+shared as a single file.
+
+Metadata is reported by the source image and remains contextual; it never becomes a visibility
+measurement input. GPS fields, camera and lens serial numbers, ownership fields, exact capture
+times, and original filenames are hidden in the app and excluded from reports by default. Select
+**Include Sensitive** before export only when the recipient should receive those fields. Embedded
+report previews are freshly compressed and do not retain the source EXIF payload.
 
 The browser keeps the original image, selections, preview, and result in memory for the current
 session. The local backend uses bounded temporary files only while decoding a request. It does not
