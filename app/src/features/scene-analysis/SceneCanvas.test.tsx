@@ -30,4 +30,34 @@ describe("scene canvas", () => {
     expect(halo).toHaveAttribute("stroke-opacity", "0.78");
     expect(halo).toHaveAttribute("stroke-width", "4");
   });
+
+  it("renders a bounded local sharpness map when requested", () => {
+    render(
+      <SceneCanvas
+        image="data:image/jpeg;base64,abc"
+        selection={{}}
+        active="target"
+        mode="select"
+        focusMap={[
+          {
+            x: 0.1,
+            y: 0.2,
+            width: 0.1,
+            height: 0.1,
+            sharpness: 0.2,
+            relative_sharpness: 0.75,
+            in_focus: true,
+          },
+        ]}
+        showFocusMap
+        onActiveChange={vi.fn()}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    const tile = screen.getByLabelText("Select Target").querySelector(".focus-tile");
+    expect(tile).toHaveAttribute("data-in-focus", "true");
+    expect(tile).toHaveAttribute("data-relative-sharpness", "0.750");
+    expect(tile).toHaveAttribute("vector-effect", "non-scaling-stroke");
+  });
 });

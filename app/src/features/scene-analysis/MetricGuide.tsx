@@ -1,4 +1,5 @@
 import { METRICS } from "./metrics";
+import { QUALITY_METRICS } from "./quality-metrics";
 
 export function StopExplainer() {
   return (
@@ -32,6 +33,39 @@ export function MetricGuide() {
         <StopExplainer />
         <div className="metric-guide-grid">
           {METRICS.map((metric) => (
+            <article key={metric.key}>
+              <header>
+                <h3>{metric.title}</h3>
+                <span>{metric.direction}</span>
+              </header>
+              <p>{metric.description}</p>
+              <dl>
+                <div>
+                  <dt>How It Is Calculated</dt>
+                  <dd>{metric.calculation}</dd>
+                </div>
+                <div>
+                  <dt>Value Range</dt>
+                  <dd>{metric.range}</dd>
+                </div>
+                <div>
+                  <dt>Is Higher Better?</dt>
+                  <dd>{metric.higherIsBetter}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+        <div className="metric-guide-section-heading">
+          <p className="eyebrow">Capture Quality</p>
+          <h2>Focus, Noise, and Artifacts</h2>
+          <p className="metric-guide-section-copy">
+            Spatial quality measurements use a bounded linear image scale. They are no-reference
+            evidence, so subject texture, lighting, and composition remain part of the result.
+          </p>
+        </div>
+        <div className="metric-guide-grid">
+          {QUALITY_METRICS.map((metric) => (
             <article key={metric.key}>
               <header>
                 <h3>{metric.title}</h3>

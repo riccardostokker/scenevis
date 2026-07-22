@@ -645,6 +645,11 @@ p {
   cursor: crosshair;
 }
 
+.focus-map,
+.focus-tile {
+  pointer-events: none;
+}
+
 .draft-region {
   pointer-events: none;
   stroke-linecap: round;
@@ -692,6 +697,12 @@ p {
 .toolbar-tools {
   display: flex;
   gap: 3px;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: rgb(255 255 255 / 14%);
 }
 
 .selection-toolbar button {
@@ -1006,6 +1017,17 @@ p {
 
 .metric-panel .section-heading {
   margin-bottom: 14px;
+}
+
+.quality-metric-section {
+  margin-top: 28px;
+}
+
+.quality-scale-note {
+  margin: 6px 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  line-height: 1.45;
 }
 
 .stop-explainer {
@@ -1385,6 +1407,10 @@ th[aria-sort="descending"] .comparison-sort-button svg {
   min-width: 960px;
 }
 
+.quality-comparison-table {
+  min-width: 1040px;
+}
+
 .comparison-table td.metadata-differs {
   background: color-mix(in oklch, var(--brand) 7%, transparent);
   box-shadow: inset 0 -2px var(--brand);
@@ -1443,6 +1469,24 @@ th[aria-sort="descending"] .comparison-sort-button svg {
 
 .metric-guide-body .stop-explainer {
   max-width: 80ch;
+}
+
+.metric-guide-section-heading {
+  max-width: 80ch;
+  margin: 34px 0 16px;
+}
+
+.metric-guide-section-heading h2 {
+  margin-bottom: 5px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 560;
+}
+
+.metric-guide-section-copy {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
 }
 
 .metric-guide-grid {

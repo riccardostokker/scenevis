@@ -235,6 +235,53 @@
         "title": "CaptureMetadata",
         "type": "object"
       },
+      "FocusTile": {
+        "description": "One normalized target tile in the local sharpness map.",
+        "properties": {
+          "height": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Height",
+            "type": "number"
+          },
+          "in_focus": {
+            "title": "In Focus",
+            "type": "boolean"
+          },
+          "relative_sharpness": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Relative Sharpness",
+            "type": "number"
+          },
+          "sharpness": {
+            "minimum": 0.0,
+            "title": "Sharpness",
+            "type": "number"
+          },
+          "width": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Width",
+            "type": "number"
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": ["x", "y", "width", "height", "sharpness", "relative_sharpness", "in_focus"],
+        "title": "FocusTile",
+        "type": "object"
+      },
       "Health": {
         "description": "Service readiness response.",
         "properties": {
@@ -601,6 +648,229 @@
         "title": "Processing",
         "type": "object"
       },
+      "QualityAnalysis": {
+        "description": "Quality KPIs and bounded diagnostics calculated at a reproducible scale.",
+        "properties": {
+          "analysis_height_px": {
+            "minimum": 1.0,
+            "title": "Analysis Height Px",
+            "type": "integer"
+          },
+          "analysis_width_px": {
+            "minimum": 1.0,
+            "title": "Analysis Width Px",
+            "type": "integer"
+          },
+          "focus_map": {
+            "items": {
+              "$ref": "#/components/schemas/FocusTile"
+            },
+            "title": "Focus Map",
+            "type": "array"
+          },
+          "focus_relative_threshold": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Focus Relative Threshold",
+            "type": "number"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/QualityMetrics"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "analysis_width_px",
+          "analysis_height_px",
+          "focus_relative_threshold",
+          "metrics",
+          "focus_map",
+          "warnings"
+        ],
+        "title": "QualityAnalysis",
+        "type": "object"
+      },
+      "QualityMetrics": {
+        "description": "Transparent capture-quality measurements derived from linear source samples.",
+        "properties": {
+          "banding_fraction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Banding Fraction"
+          },
+          "center_to_corner_falloff": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Center To Corner Falloff"
+          },
+          "channel_saturation_clipping": {
+            "title": "Channel Saturation Clipping",
+            "type": "number"
+          },
+          "chroma_noise": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chroma Noise"
+          },
+          "detail_to_noise_ratio": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail To Noise Ratio"
+          },
+          "directional_blur_angle_degrees": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directional Blur Angle Degrees"
+          },
+          "directional_blur_anisotropy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Directional Blur Anisotropy"
+          },
+          "jpeg_blockiness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jpeg Blockiness"
+          },
+          "luminance_noise": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Luminance Noise"
+          },
+          "ringing_halo_strength": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ringing Halo Strength"
+          },
+          "target_edge_acutance": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Edge Acutance"
+          },
+          "target_edge_width_px": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Edge Width Px"
+          },
+          "target_in_focus_coverage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target In Focus Coverage"
+          },
+          "target_sharpness": {
+            "title": "Target Sharpness",
+            "type": "number"
+          },
+          "target_sharpness_consistency": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Sharpness Consistency"
+          }
+        },
+        "required": [
+          "target_sharpness",
+          "target_edge_acutance",
+          "target_edge_width_px",
+          "target_in_focus_coverage",
+          "target_sharpness_consistency",
+          "directional_blur_anisotropy",
+          "directional_blur_angle_degrees",
+          "luminance_noise",
+          "chroma_noise",
+          "detail_to_noise_ratio",
+          "jpeg_blockiness",
+          "ringing_halo_strength",
+          "banding_fraction",
+          "channel_saturation_clipping",
+          "center_to_corner_falloff"
+        ],
+        "title": "QualityMetrics",
+        "type": "object"
+      },
       "Rectangle": {
         "description": "A normalized rectangular region.",
         "properties": {
@@ -790,6 +1060,9 @@
           "processing": {
             "$ref": "#/components/schemas/Processing"
           },
+          "quality": {
+            "$ref": "#/components/schemas/QualityAnalysis"
+          },
           "region_statistics": {
             "additionalProperties": {
               "$ref": "#/components/schemas/RegionStatistics"
@@ -802,7 +1075,7 @@
             "type": "string"
           },
           "version": {
-            "default": 2,
+            "default": 3,
             "title": "Version",
             "type": "integer"
           },
@@ -821,6 +1094,7 @@
           "processing",
           "region_statistics",
           "metrics",
+          "quality",
           "warnings"
         ],
         "title": "Result",

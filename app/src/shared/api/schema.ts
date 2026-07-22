@@ -142,6 +142,26 @@ export interface components {
             width_px: number;
         };
         /**
+         * FocusTile
+         * @description One normalized target tile in the local sharpness map.
+         */
+        FocusTile: {
+            /** Height */
+            height: number;
+            /** In Focus */
+            in_focus: boolean;
+            /** Relative Sharpness */
+            relative_sharpness: number;
+            /** Sharpness */
+            sharpness: number;
+            /** Width */
+            width: number;
+            /** X */
+            x: number;
+            /** Y */
+            y: number;
+        };
+        /**
          * Health
          * @description Service readiness response.
          */
@@ -328,6 +348,59 @@ export interface components {
             white_level?: number | null;
         };
         /**
+         * QualityAnalysis
+         * @description Quality KPIs and bounded diagnostics calculated at a reproducible scale.
+         */
+        QualityAnalysis: {
+            /** Analysis Height Px */
+            analysis_height_px: number;
+            /** Analysis Width Px */
+            analysis_width_px: number;
+            /** Focus Map */
+            focus_map: components["schemas"]["FocusTile"][];
+            /** Focus Relative Threshold */
+            focus_relative_threshold: number;
+            metrics: components["schemas"]["QualityMetrics"];
+            /** Warnings */
+            warnings: string[];
+        };
+        /**
+         * QualityMetrics
+         * @description Transparent capture-quality measurements derived from linear source samples.
+         */
+        QualityMetrics: {
+            /** Banding Fraction */
+            banding_fraction: number | null;
+            /** Center To Corner Falloff */
+            center_to_corner_falloff: number | null;
+            /** Channel Saturation Clipping */
+            channel_saturation_clipping: number;
+            /** Chroma Noise */
+            chroma_noise: number | null;
+            /** Detail To Noise Ratio */
+            detail_to_noise_ratio: number | null;
+            /** Directional Blur Angle Degrees */
+            directional_blur_angle_degrees: number | null;
+            /** Directional Blur Anisotropy */
+            directional_blur_anisotropy: number | null;
+            /** Jpeg Blockiness */
+            jpeg_blockiness: number | null;
+            /** Luminance Noise */
+            luminance_noise: number | null;
+            /** Ringing Halo Strength */
+            ringing_halo_strength: number | null;
+            /** Target Edge Acutance */
+            target_edge_acutance: number | null;
+            /** Target Edge Width Px */
+            target_edge_width_px: number | null;
+            /** Target In Focus Coverage */
+            target_in_focus_coverage: number | null;
+            /** Target Sharpness */
+            target_sharpness: number;
+            /** Target Sharpness Consistency */
+            target_sharpness_consistency: number | null;
+        };
+        /**
          * Rectangle
          * @description A normalized rectangular region.
          */
@@ -409,6 +482,7 @@ export interface components {
              */
             preview_notice: string;
             processing: components["schemas"]["Processing"];
+            quality: components["schemas"]["QualityAnalysis"];
             /** Region Statistics */
             region_statistics: {
                 [key: string]: components["schemas"]["RegionStatistics"];
@@ -417,7 +491,7 @@ export interface components {
             scene_id: string;
             /**
              * Version
-             * @default 2
+             * @default 3
              */
             version: number;
             /** Warnings */
