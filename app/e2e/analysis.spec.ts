@@ -75,10 +75,15 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
 
   await expect(page.getByRole("heading", { name: "Location Study" })).toBeVisible();
   const measurementTable = page.getByLabel("Key Measurements");
+  const qualityTable = page.getByLabel("Focus and Detail");
   await expect(measurementTable.getByRole("cell", { name: "North Approach" })).toBeVisible();
   await expect(measurementTable.getByRole("cell", { name: "South Platform" })).toBeVisible();
   await expect(page.getByText("2 of 2 scenarios analyzed")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Camera Settings", exact: true })).toBeVisible();
+  await expect(
+    qualityTable.getByRole("button", { name: "Sort by Target Sharpness", exact: true }),
+  ).toBeVisible();
+  await expect(qualityTable.getByRole("cell", { name: "North Approach" })).toBeVisible();
   const focalLengthFilter = page.getByRole("combobox", { name: "Focal Length Filter" });
   await focalLengthFilter.click();
   await page.getByRole("option", { name: "48 mm", exact: true }).click();
@@ -105,6 +110,8 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(page.getByText("How to Read the Measurements")).toBeVisible();
   await page.getByText("How to Read the Measurements").click();
   await expect(page.getByText("What Is a Stop?")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Focus, Noise, and Artifacts" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "JPEG Blockiness" })).toBeVisible();
   await expect(page.getByText("Is Higher Better?").first()).toBeVisible();
   await expect(page.locator(".difference-count")).toContainText(/\d+ Difference/);
   await expect(page.getByRole("combobox", { name: "Report Metadata" })).toContainText(
@@ -131,6 +138,9 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   expect(html).toContain("South Platform");
   expect(html).toContain("Key Measurements");
   expect(html).toContain("What Is a Stop?");
+  expect(html).toContain("Focus, Noise, and Artifacts");
+  expect(html).toContain("Target Sharpness");
+  expect(html).toContain("data-focus-tile");
   expect(html).toContain("Is Higher Better?");
   expect(html).toContain("Camera Settings");
   expect(html).toContain("Filter by Camera Settings");
@@ -146,6 +156,8 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(reportPage.getByRole("heading", { name: "North Approach" })).toBeVisible();
   await expect(reportPage.getByRole("heading", { name: "South Platform" })).toBeVisible();
   await expect(reportPage.getByRole("heading", { name: "What Is a Stop?" })).toBeVisible();
+  await expect(reportPage.getByRole("heading", { name: "Focus and Detail" })).toBeVisible();
+  await expect(reportPage.getByRole("heading", { name: "JPEG Blockiness" }).first()).toBeVisible();
   const reportFocalLength = reportPage.getByRole("combobox", { name: "Focal Length Filter" });
   await reportFocalLength.selectOption({ label: "48 mm" });
   await expect(reportPage.getByText("Showing 1 of 2")).toBeVisible();
@@ -193,6 +205,11 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await page.getByRole("tab", { name: "Annotate" }).click();
   await expect(page.locator(".selection-toolbar")).toBeVisible();
   await expect(page.getByRole("button", { name: "Lasso", exact: true })).toBeVisible();
+  const focusMap = page.getByRole("button", { name: "Focus Map" });
+  await expect(focusMap).toBeEnabled();
+  await focusMap.click();
+  await expect(focusMap).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".focus-tile").first()).toBeVisible();
   const hasHorizontalOverflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );

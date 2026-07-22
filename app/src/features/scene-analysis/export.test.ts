@@ -20,6 +20,11 @@ describe("comparison report", () => {
     expect(html).toContain("data:image/jpeg;base64,abc123");
     expect(html).toContain("data:image/jpeg;base64,xyz789");
     expect(html).toContain("Robust Contrast-to-Noise Ratio");
+    expect(html).toContain("Target Sharpness");
+    expect(html).toContain("Focus, Noise, and Artifacts");
+    expect(html).toContain('data-sort-key="quality:target_sharpness"');
+    expect(html).toContain("data-focus-map");
+    expect(html).toContain("data-focus-tile");
     expect(html).toContain("How to Read the Measurements");
     expect(html).toContain("What Is a Stop?");
     expect(html).toContain("How It Is Calculated");
@@ -132,6 +137,40 @@ function reportScenario(
         target_below_1_percent: 0.4,
         dr_local_median_stops: 4.2,
         michelson_contrast: -0.1,
+      },
+      quality: {
+        analysis_width_px: 1600,
+        analysis_height_px: 1067,
+        focus_relative_threshold: 0.5,
+        warnings: ["Compare similarly framed scenes"],
+        focus_map: [
+          {
+            x: 0.1,
+            y: 0.2,
+            width: 0.1,
+            height: 0.1,
+            sharpness: 0.08,
+            relative_sharpness: 0.8,
+            in_focus: true,
+          },
+        ],
+        metrics: {
+          target_sharpness: contrast / 100,
+          target_edge_acutance: 0.08,
+          target_edge_width_px: 1.4,
+          target_in_focus_coverage: 0.75,
+          target_sharpness_consistency: 0.2,
+          directional_blur_anisotropy: 0.1,
+          directional_blur_angle_degrees: 45,
+          luminance_noise: 0.002,
+          chroma_noise: 0.003,
+          detail_to_noise_ratio: 12,
+          jpeg_blockiness: 0.04,
+          ringing_halo_strength: 0.01,
+          banding_fraction: 0.02,
+          channel_saturation_clipping: 0.005,
+          center_to_corner_falloff: 0.12,
+        },
       },
     },
   } as unknown as Analysis;

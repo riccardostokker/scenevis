@@ -1,4 +1,4 @@
-import type { Dispatch } from "react";
+import { useState, type Dispatch } from "react";
 
 import { MetadataPanel } from "./MetadataPanel";
 import { MetricPanel } from "./MetricPanel";
@@ -25,6 +25,7 @@ export function ScenarioEditor({
   onAnalyze,
   dispatch,
 }: Props) {
+  const [showFocusMap, setShowFocusMap] = useState(false);
   if (!scenario) return null;
   if (!scenario.preview) {
     return (
@@ -63,6 +64,8 @@ export function ScenarioEditor({
               selection={scenario.selection}
               active={scenario.activeRegion}
               mode={scenario.drawingMode}
+              focusMap={scenario.analysis?.result.quality.focus_map}
+              showFocusMap={showFocusMap}
               onActiveChange={(activeRegion) =>
                 dispatch({ type: "activeRegionChanged", id: scenario.id, activeRegion })
               }
@@ -73,6 +76,9 @@ export function ScenarioEditor({
                   onModeChange={(drawingMode) =>
                     dispatch({ type: "drawingModeChanged", id: scenario.id, drawingMode })
                   }
+                  focusMapAvailable={Boolean(scenario.analysis?.result.quality.focus_map.length)}
+                  showFocusMap={showFocusMap}
+                  onFocusMapChange={setShowFocusMap}
                 />
               }
             />

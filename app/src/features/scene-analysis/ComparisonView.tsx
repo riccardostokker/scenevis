@@ -21,6 +21,11 @@ import {
   mismatchFields,
 } from "./metadata";
 import { REGION_NAMES } from "./model";
+import {
+  formatQualityMetric,
+  QUALITY_HEADLINE_METRICS,
+  qualityMetricValue,
+} from "./quality-metrics";
 import { RegionShape } from "./SceneCanvas";
 import type { CompletedScenario, Scenario } from "./scenarios";
 import {
@@ -216,6 +221,53 @@ export function ComparisonView({ scenarios }: { scenarios: Scenario[] }) {
             </div>
           </section>
 
+          <section className="comparison-table-section" aria-labelledby="quality-table-heading">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Capture Quality</p>
+                <h2 id="quality-table-heading">Focus and Detail</h2>
+                <p className="comparison-section-description">
+                  Compare similarly framed targets. Subject texture remains part of every
+                  no-reference quality score.
+                </p>
+              </div>
+            </div>
+            <div className="comparison-table-wrap">
+              <Table className="comparison-table quality-comparison-table">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Scenario</TableHead>
+                    {QUALITY_HEADLINE_METRICS.map((metric) => (
+                      <SortableTableHead
+                        key={metric.key}
+                        title={metric.title}
+                        description={metric.description}
+                        target={{ source: "quality", key: metric.key }}
+                        sort={sort}
+                        onSort={toggleSort}
+                      />
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visible.map((scenario) => (
+                    <TableRow key={scenario.id}>
+                      <TableCell className="scenario-name-cell">{scenario.name}</TableCell>
+                      {QUALITY_HEADLINE_METRICS.map((metric) => (
+                        <TableCell key={metric.key}>
+                          {formatQualityMetric(
+                            metric,
+                            scenario.analysis.result.quality.metrics[metric.key],
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </section>
+
           <MetricGuide />
 
           <section className="scenario-grid" aria-label="Analyzed Scenario Frames">
@@ -261,6 +313,17 @@ export function ComparisonView({ scenarios }: { scenarios: Scenario[] }) {
                           <dt>{metric.title}</dt>
                           <dd>
                             {formatMetric(metric, scenario.analysis.result.metrics[metric.key])}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <p className="eyebrow metric-eyebrow">Capture Quality</p>
+                    <dl>
+                      {QUALITY_HEADLINE_METRICS.slice(0, 3).map((metric) => (
+                        <div key={metric.key}>
+                          <dt>{metric.title}</dt>
+                          <dd>
+                            {qualityMetricValue(metric, scenario.analysis.result.quality.metrics)}
                           </dd>
                         </div>
                       ))}

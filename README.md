@@ -7,9 +7,10 @@
 > The [GitHub repository](https://github.com/riccardostokker/scenevis) is a read-only mirror.
 > Please open issues and merge requests on GitLab.
 
-Scenevis measures how clearly a selected target separates from its photographic surroundings. It
-combines an interactive React workspace with a typed Python analysis engine for RAW and raster
-images, then turns several photographed locations into one comparable visibility study.
+Scenevis measures how clearly a selected target separates from its photographic surroundings and
+how well each capture preserves target detail. It combines an interactive React workspace with a
+typed Python analysis engine for RAW and raster images, then turns several photographed locations
+into one comparable visibility and image-quality study.
 
 The workflow is visual: add images, mark each target, review the suggested reference regions, and
 compare the resulting measurements. No YAML sidecars or project files are required.
@@ -35,6 +36,7 @@ compare the resulting measurements. No YAML sidecars or project files are requir
 - Supports box and freehand lasso selection with editable SVG regions.
 - Suggests local and bright reference regions as soon as the target is drawn.
 - Calculates eight ordered target-visibility measurements from linear source data.
+- Derives 14 focus, noise, tonal, and artifact KPIs plus a local target-sharpness map.
 - Extracts normalized camera settings and bounded source metadata from RAW and raster images.
 - Highlights aperture, shutter, ISO, focal-length, EV100, and camera mismatches across scenarios.
 - Compares completed scenarios in aligned frames and a summary table.
@@ -62,7 +64,8 @@ Open <http://127.0.0.1:5173> and follow the workspace from left to right:
 3. Select **Target**, then draw it with the floating **Box** or **Lasso** tool.
 4. Review or refine the detected **Local Background** and **Bright Background**.
 5. Analyze each scenario, or use **Analyze All** when every target is ready.
-6. Open **Compare**, then export the finished location study as HTML.
+6. Toggle **Focus Map** over an analyzed target to inspect where detail falls away.
+7. Open **Compare**, then export the finished location study as HTML.
 
 ## Automatic Regions
 
@@ -101,6 +104,35 @@ bright reference is brighter than the region being compared; a negative result m
 | Local-Background Dynamic Range | `log₂(bright-background median ÷ local-background median)`. It counts brightness doublings between the two background references. | No fixed range; 0 stops is equal, +1 is 2× brighter, and +2 is 4× brighter. | No. This is lighting context, not a score. |
 | Michelson Contrast | `(target median − local median) ÷ (target median + local median)`. It compares darker and brighter targets symmetrically. | −1 to +1; 0 means equal brightness. | Distance from 0 matters. The sign means darker (−) or brighter (+). |
 
+### Capture Quality
+
+Spatial quality measurements use linear source data reduced to at most 1,600 pixels on the
+longest edge without upscaling. This bounded scale makes interactive comparison practical and is
+reported with every result. Metrics return **Not Available** when the selected target or scene
+does not contain enough supporting evidence.
+
+| Measurement | Meaning and Calculation | Value Range | Is Higher Better? |
+| --- | --- | --- | --- |
+| Target Sharpness | Root-mean-square Sobel gradient magnitude throughout the target. | 0 to no fixed maximum. | Usually, for similarly framed and textured targets. |
+| Target Edge Acutance | 90th-percentile target gradient magnitude. | 0 to approximately 1 for ordinary normalized images. | Usually; sharpening and subject contrast also raise it. |
+| Target Edge Width | Median 10%–90% transition width across suitable strong target edges. | 0 pixels to no fixed maximum, or unavailable. | No. Narrower edges are sharper. |
+| Target In-Focus Coverage | Target tiles retaining at least half the target's 90th-percentile local sharpness. | 0% to 100%, or unavailable. | Usually, but it is relative within the target. |
+| Target Sharpness Consistency | Robust spread of tile sharpness divided by median tile sharpness. | 0 to no fixed maximum, or unavailable. | No. Lower is more even. |
+| Directional Blur Evidence | Directional concentration of strong target gradients, with the weakest orientation reported as the probable blur direction. | 0 to 1, or unavailable. | No. Lower is more balanced. |
+| Luminance Noise | Robust high-pass brightness residual in the smoothest target and local-background samples. | 0% to no fixed maximum of normalized full scale, or unavailable. | No. Lower is cleaner. |
+| Chroma Noise | Robust high-pass red–green and blue–green residual magnitude in smooth samples. | 0% to no fixed maximum of normalized full scale, or unavailable. | No. Lower is cleaner. |
+| Detail-to-Noise Ratio | Target edge acutance divided by estimated luminance noise. | 0 to no fixed maximum, or unavailable. | Usually. Higher separates detail more clearly from noise. |
+| JPEG Blockiness | Excess discontinuity across the source JPEG's 8×8 block grid relative to neighbouring differences. | 0 to no fixed maximum; JPEG only. | No. Lower is better. |
+| Ringing and Halo Strength | Edge-profile overshoot or undershoot divided by edge contrast. | 0% to no fixed maximum, or unavailable. | No. Lower is better. |
+| Banding Evidence | Tonal-level sparsity combined with repeated plateaus in smooth gradient tiles. | 0% to 100%, or unavailable. | No. Lower is better. |
+| Channel Saturation Clipping | Source pixels where at least one RGB channel reaches 99% of normalized intensity. | 0% to 100%. | No. Lower preserves more colour information. |
+| Center-to-Corner Falloff | Centre median minus corner median luminance, divided by centre median. | No fixed range; positive values mean darker corners. | Values closer to zero are more uniform. |
+
+These are no-reference measurements rather than a single quality grade. Target texture affects
+sharpness, scene geometry affects directional evidence, and composition affects apparent
+vignetting. Scenevis keeps those measurements separate and shows interpretation warnings instead
+of collapsing them into an opaque overall score.
+
 The live comparison view can filter scenarios by exact reported aperture, shutter speed, ISO,
 focal length, exposure value, or camera. Every numerical table heading is sortable; the selected
 order also controls the scenario frames, while missing metadata remains at the end.
@@ -110,9 +142,10 @@ pass/fail thresholds: acceptable visibility depends on the scene, display, task,
 
 ## Reports and Data Handling
 
-The exported HTML report embeds a compressed display preview and validated zones for every
-completed scenario. It also contains an aligned comparison table, ordered KPI values, their
-plain-language descriptions, camera-setting comparisons, source metadata, and measurement
+The exported HTML report embeds a compressed display preview, focus map, and validated zones for
+every completed scenario. It also contains aligned visibility and quality comparison tables,
+ordered KPI values, their plain-language descriptions, camera-setting comparisons, source
+metadata, and measurement
 warnings. Camera-setting filters and sortable numerical columns update both tables and the image
 frames without discarding any scenario data. The artifact has no external assets or network
 access; its small inline controller is constrained by a content-security policy, so it can be

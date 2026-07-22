@@ -1,5 +1,6 @@
-import type { Metrics } from "./model";
+import type { Metrics, QualityMetrics } from "./model";
 import { METRICS } from "./metrics";
+import { QUALITY_METRICS } from "./quality-metrics";
 import {
   CAPTURE_COMPARISON_FIELDS,
   metadataValue,
@@ -14,7 +15,8 @@ export type ComparisonFilters = Partial<Record<MetadataFieldKey, string>>;
 export type SortDirection = "ascending" | "descending";
 export type ComparisonSortTarget =
   | { source: "capture"; key: MetadataFieldKey }
-  | { source: "metric"; key: keyof Metrics };
+  | { source: "metric"; key: keyof Metrics }
+  | { source: "quality"; key: keyof QualityMetrics };
 export type ComparisonSort = ComparisonSortTarget & { direction: SortDirection };
 
 export type FilterOption = {
@@ -67,12 +69,8 @@ export function comparisonScenarios(
     .map((scenario, index) => ({ scenario, index }))
     .sort((left, right) => {
       const comparison = compareOptional(
-        sort.source === "capture"
-          ? (field?.numericValue?.(left.scenario.preview.metadata.summary) ?? null)
-          : left.scenario.analysis.result.metrics[sort.key],
-        sort.source === "capture"
-          ? (field?.numericValue?.(right.scenario.preview.metadata.summary) ?? null)
-          : right.scenario.analysis.result.metrics[sort.key],
+        sortValue(left.scenario, sort, field),
+        sortValue(right.scenario, sort, field),
         sort.direction,
       );
       return comparison || left.index - right.index;
@@ -85,8 +83,22 @@ export function sortLabel(sort: ComparisonSort | null): string | null {
   const title =
     sort.source === "capture"
       ? CAPTURE_COMPARISON_FIELDS.find((field) => field.key === sort.key)?.title
-      : METRICS.find((metric) => metric.key === sort.key)?.title;
+      : sort.source === "metric"
+        ? METRICS.find((metric) => metric.key === sort.key)?.title
+        : QUALITY_METRICS.find((metric) => metric.key === sort.key)?.title;
   return `${title ?? sort.key} ${sort.direction}`;
+}
+
+function sortValue(
+  scenario: CompletedScenario,
+  sort: ComparisonSort,
+  field: MetadataField | undefined,
+): number | null {
+  if (sort.source === "capture") {
+    return field?.numericValue?.(scenario.preview.metadata.summary) ?? null;
+  }
+  if (sort.source === "metric") return scenario.analysis.result.metrics[sort.key];
+  return scenario.analysis.result.quality.metrics[sort.key];
 }
 
 function compareOptional(

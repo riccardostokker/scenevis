@@ -31,6 +31,10 @@ describe("comparison view model", () => {
       { source: "metric", key: "cnr_robust", direction: "descending" },
       ["Stopped Down", "Missing", "Wide"],
     ],
+    [
+      { source: "quality", key: "target_sharpness", direction: "ascending" },
+      ["Wide", "Missing", "Stopped Down"],
+    ],
   ] satisfies [ComparisonSort, string[]][])(
     "sorts numeric values and leaves missing metadata last",
     (sort, expected) => {
@@ -69,6 +73,11 @@ function scenario(
         },
       },
     },
-    analysis: { result: { metrics: { cnr_robust: contrast } } },
+    analysis: {
+      result: {
+        metrics: { cnr_robust: contrast },
+        quality: { metrics: { target_sharpness: contrast } },
+      },
+    },
   } as unknown as CompletedScenario;
 }

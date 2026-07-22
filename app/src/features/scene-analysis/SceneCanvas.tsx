@@ -3,6 +3,7 @@ import { useState, type PointerEvent, type ReactNode } from "react";
 import { appendPoint, polygon, rectangle } from "./drawing";
 import {
   DRAWING_MODE_LABELS,
+  type FocusTile,
   REGION_COLORS,
   REGION_LABELS,
   REGION_NAMES,
@@ -22,6 +23,8 @@ type Props = {
   onActiveChange: (name: RegionName) => void;
   onSelect: (name: RegionName, region: Region) => void;
   toolbar?: ReactNode;
+  focusMap?: FocusTile[];
+  showFocusMap?: boolean;
 };
 
 export function SceneCanvas({
@@ -32,6 +35,8 @@ export function SceneCanvas({
   onActiveChange,
   onSelect,
   toolbar,
+  focusMap = [],
+  showFocusMap = false,
 }: Props) {
   const [origin, setOrigin] = useState<Point | null>(null);
   const [cursor, setCursor] = useState<Point | null>(null);
@@ -87,6 +92,30 @@ export function SceneCanvas({
         onPointerUp={finish}
         onPointerCancel={resetDraft}
       >
+        {showFocusMap && focusMap.length > 0 && (
+          <g className="focus-map">
+            <title>Local Target Sharpness Map</title>
+            {focusMap.map((tile) => (
+              <rect
+                key={`${tile.x}-${tile.y}`}
+                className="focus-tile"
+                x={tile.x}
+                y={tile.y}
+                width={tile.width}
+                height={tile.height}
+                fill={REGION_COLORS.target}
+                fillOpacity={0.08 + tile.relative_sharpness * 0.44}
+                stroke={REGION_COLORS.target}
+                strokeOpacity={0.2 + tile.relative_sharpness * 0.55}
+                strokeWidth={0.75}
+                vectorEffect="non-scaling-stroke"
+                data-in-focus={tile.in_focus}
+                data-relative-sharpness={tile.relative_sharpness.toFixed(3)}
+              />
+            ))}
+          </g>
+        )}
+
         {REGION_NAMES.map((name) => {
           const region = selection[name];
           if (!region) return null;

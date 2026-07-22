@@ -1,5 +1,5 @@
 import { DRAWING_MODE_LABELS, DRAWING_MODES, type DrawingMode } from "./model";
-import { Lasso, MousePointer2, SquareDashed } from "lucide-react";
+import { Lasso, MousePointer2, ScanSearch, SquareDashed } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -7,12 +7,21 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 type Props = {
   mode: DrawingMode;
   onModeChange: (mode: DrawingMode) => void;
+  focusMapAvailable: boolean;
+  showFocusMap: boolean;
+  onFocusMapChange: (visible: boolean) => void;
 };
 
-export function SelectionToolbar({ mode, onModeChange }: Props) {
+export function SelectionToolbar({
+  mode,
+  onModeChange,
+  focusMapAvailable,
+  showFocusMap,
+  onFocusMapChange,
+}: Props) {
   return (
-    <fieldset className="selection-toolbar" aria-label="Drawing Tools">
-      <legend className="sr-only">Drawing Tools</legend>
+    <fieldset className="selection-toolbar" aria-label="Image Tools">
+      <legend className="sr-only">Image Tools</legend>
       <div className="toolbar-grip" aria-hidden="true" />
       <div className="toolbar-tools">
         {DRAWING_MODES.map((drawingMode) => (
@@ -36,6 +45,26 @@ export function SelectionToolbar({ mode, onModeChange }: Props) {
           </Tooltip>
         ))}
       </div>
+      <div className="toolbar-separator" aria-hidden="true" />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            type="button"
+            size="icon"
+            variant={showFocusMap ? "secondary" : "ghost"}
+            className={showFocusMap ? "active" : ""}
+            aria-label="Focus Map"
+            aria-pressed={showFocusMap}
+            disabled={!focusMapAvailable}
+            onClick={() => onFocusMapChange(!showFocusMap)}
+          >
+            <ScanSearch className="tool-mark" aria-hidden="true" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="top" sideOffset={8}>
+          {focusMapAvailable ? "Focus Map" : "Analyze to Create a Focus Map"}
+        </TooltipContent>
+      </Tooltip>
     </fieldset>
   );
 }
