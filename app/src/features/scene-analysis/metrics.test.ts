@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { METRICS } from "./metrics";
 
 describe("metric presentation", () => {
-  it("orders named and described metrics by visibility importance", () => {
+  it("orders and fully explains metrics by visibility importance", () => {
     expect(METRICS.map((metric) => metric.title)).toEqual([
       "Robust Contrast-to-Noise Ratio",
       "Weber Contrast",
@@ -15,5 +15,9 @@ describe("metric presentation", () => {
       "Michelson Contrast",
     ]);
     expect(METRICS.every((metric) => metric.description.length > 30)).toBe(true);
+    expect(METRICS.every((metric) => metric.calculation.length > 50)).toBe(true);
+    expect(METRICS.every((metric) => metric.range.length > 30)).toBe(true);
+    expect(METRICS.every((metric) => metric.direction.length > 10)).toBe(true);
+    expect(METRICS.every((metric) => metric.higherIsBetter.length > 50)).toBe(true);
   });
 });

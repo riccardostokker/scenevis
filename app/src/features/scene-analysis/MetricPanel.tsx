@@ -1,4 +1,5 @@
 import type { Analysis } from "../../shared/api/client";
+import { StopExplainer } from "./MetricGuide";
 import { formatMetric, METRICS } from "./metrics";
 
 export function MetricPanel({ analysis }: { analysis: Analysis }) {
@@ -11,6 +12,8 @@ export function MetricPanel({ analysis }: { analysis: Analysis }) {
           <h2 id="metric-heading">Visibility Metrics</h2>
         </div>
       </div>
+
+      <StopExplainer />
 
       {result.warnings.length > 0 && (
         <div className="warnings" role="status">
@@ -27,8 +30,28 @@ export function MetricPanel({ analysis }: { analysis: Analysis }) {
         {METRICS.map((definition) => (
           <li key={definition.key}>
             <div className="metric-copy">
-              <h3>{definition.title}</h3>
+              <div className="metric-title-row">
+                <h3>{definition.title}</h3>
+                <span>{definition.direction}</span>
+              </div>
               <p>{definition.description}</p>
+              <details className="metric-details">
+                <summary>Calculation and Range</summary>
+                <dl>
+                  <div>
+                    <dt>How It Is Calculated</dt>
+                    <dd>{definition.calculation}</dd>
+                  </div>
+                  <div>
+                    <dt>Value Range</dt>
+                    <dd>{definition.range}</dd>
+                  </div>
+                  <div>
+                    <dt>Is Higher Better?</dt>
+                    <dd>{definition.higherIsBetter}</dd>
+                  </div>
+                </dl>
+              </details>
             </div>
             <strong>{formatMetric(definition, result.metrics[definition.key])}</strong>
           </li>

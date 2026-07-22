@@ -1008,6 +1008,27 @@ p {
   margin-bottom: 14px;
 }
 
+.stop-explainer {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklch, var(--brand) 5%, var(--card));
+}
+
+.stop-explainer h3 {
+  margin-bottom: 4px;
+  color: var(--brand-readable);
+  font-size: 0.72rem;
+}
+
+.stop-explainer p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
 .warnings {
   margin: 0 0 18px;
   padding: 12px 14px;
@@ -1042,8 +1063,29 @@ p {
 }
 
 .metric-copy h3 {
-  margin-bottom: 2px;
+  margin: 0;
   font-size: 0.78rem;
+}
+
+.metric-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.metric-title-row span,
+.metric-guide-grid header span {
+  padding: 2px 5px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--brand-readable);
+  background: color-mix(in oklch, var(--brand) 5%, transparent);
+  font-size: 0.52rem;
+  font-weight: 760;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
 }
 
 .metric-copy p {
@@ -1054,9 +1096,49 @@ p {
 }
 
 .metric-list strong {
+  align-self: start;
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.metric-details {
+  margin-top: 8px;
+}
+
+.metric-details summary {
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 680;
+}
+
+.metric-details summary::marker,
+.metric-guide > summary::marker {
+  color: var(--brand-readable);
+}
+
+.metric-details dl {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 2px;
+}
+
+.metric-details dt,
+.metric-guide-grid dt {
+  color: var(--foreground);
+  font-size: 0.57rem;
+  font-weight: 760;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.metric-details dd,
+.metric-guide-grid dd {
+  margin: 2px 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.65rem;
+  line-height: 1.45;
 }
 
 .preview-notice {
@@ -1172,6 +1254,98 @@ p {
 .comparison-table td.metadata-differs {
   background: color-mix(in oklch, var(--brand) 7%, transparent);
   box-shadow: inset 0 -2px var(--brand);
+}
+
+.metric-guide {
+  margin: -14px 0 42px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+}
+
+.metric-guide > summary {
+  padding: 16px 18px;
+  cursor: pointer;
+}
+
+.metric-guide > summary > span {
+  display: inline-grid;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.metric-guide > summary .eyebrow {
+  margin-bottom: 2px;
+}
+
+.metric-guide > summary strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 560;
+}
+
+.metric-guide > summary small {
+  float: right;
+  margin-top: 13px;
+  color: var(--muted-foreground);
+  font-size: 0.67rem;
+}
+
+.metric-guide[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.metric-guide-body {
+  padding: 18px;
+}
+
+.metric-guide-intro {
+  max-width: 80ch;
+  margin: 0 0 16px;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.metric-guide-body .stop-explainer {
+  max-width: 80ch;
+}
+
+.metric-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 28px;
+}
+
+.metric-guide-grid article {
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.metric-guide-grid header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 9px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.metric-guide-grid h3 {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.metric-guide-grid article > p {
+  margin: 0 0 12px;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.metric-guide-grid dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
 }
 
 .scenario-grid {
@@ -1297,6 +1471,10 @@ p {
     display: grid;
     grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1fr);
     gap: 28px;
+  }
+
+  .metric-guide-grid {
+    grid-template-columns: 1fr;
   }
 }
 

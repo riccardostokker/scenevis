@@ -79,6 +79,10 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(measurementTable.getByRole("cell", { name: "South Platform" })).toBeVisible();
   await expect(page.getByText("2 of 2 scenarios analyzed")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Camera Settings" })).toBeVisible();
+  await expect(page.getByText("How to Read the Measurements")).toBeVisible();
+  await page.getByText("How to Read the Measurements").click();
+  await expect(page.getByText("What Is a Stop?")).toBeVisible();
+  await expect(page.getByText("Is Higher Better?").first()).toBeVisible();
   await expect(page.locator(".difference-count")).toContainText(/\d+ Difference/);
   await expect(page.getByRole("combobox", { name: "Report Metadata" })).toContainText(
     "Safe Metadata",
@@ -103,6 +107,8 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   expect(html).toContain("North Approach");
   expect(html).toContain("South Platform");
   expect(html).toContain("Key Measurements");
+  expect(html).toContain("What Is a Stop?");
+  expect(html).toContain("Is Higher Better?");
   expect(html).toContain("Camera Settings");
   expect(html).toContain("Sensitive source fields and original filenames are excluded.");
   expect(html).not.toContain("IMG_0085.JPG");
@@ -115,6 +121,7 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(reportPage.getByRole("heading", { name: "Location Study" })).toBeVisible();
   await expect(reportPage.getByRole("heading", { name: "North Approach" })).toBeVisible();
   await expect(reportPage.getByRole("heading", { name: "South Platform" })).toBeVisible();
+  await expect(reportPage.getByRole("heading", { name: "What Is a Stop?" })).toBeVisible();
   expect(await reportPage.locator(".scenario").count()).toBe(2);
   expect(await reportPage.locator("svg text").count()).toBe(0);
   await reportPage.screenshot({

@@ -1,4 +1,5 @@
 import { formatMetric, METRICS } from "./metrics";
+import { MetricGuide } from "./MetricGuide";
 import {
   CAPTURE_CARD_FIELDS,
   CAPTURE_COMPARISON_FIELDS,
@@ -136,6 +137,8 @@ export function ComparisonView({ scenarios }: { scenarios: Scenario[] }) {
           </Table>
         </div>
       </section>
+
+      <MetricGuide />
 
       <section className="scenario-grid" aria-label="Analyzed Scenario Frames">
         {completed.map((scenario) => (

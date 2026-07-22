@@ -81,16 +81,25 @@ Select **Redetect** at any time to rebuild both suggestions from the current tar
 
 Scenevis orders evidence by its usefulness when comparing target visibility:
 
-| Measurement | What it shows |
-| --- | --- |
-| Robust Contrast-to-Noise Ratio | Target separation from its local background, including variation in both regions |
-| Weber Contrast | Signed target brightness relative to the local background |
-| Target Dynamic Range | Bright-background to target separation in photographic stops |
-| Target Signal-to-Noise Ratio | Target signal relative to variation within the target region |
-| Bright-Background Clipping | Share of reference pixels at or above 99% |
-| Target Shadows Below 1% | Share of target pixels near the normalized linear shadow floor |
-| Local-Background Dynamic Range | Bright-background to local-background separation in stops |
-| Michelson Contrast | Symmetric supporting contrast between target and local background |
+Brightness is measured from linear source data on a normalized scale where `0` is black and `1`
+is the image maximum. A **median** is the middle pixel brightness, so it is less affected by a few
+unusually bright or dark pixels. **Robust variation** describes pixel spread using the median
+absolute deviation, which is also less sensitive to outliers.
+
+A photographic **stop** is one doubling or halving of brightness. A difference of 1 stop is 2×,
+2 stops is 4×, and 3 stops is 8×. For Scenevis dynamic-range values, a positive result means the
+bright reference is brighter than the region being compared; a negative result means it is darker.
+
+| Measurement | Meaning and Calculation | Value Range | Is Higher Better? |
+| --- | --- | --- | --- |
+| Robust Contrast-to-Noise Ratio | Absolute difference between target and local-background median brightness, divided by their combined robust variation. It shows how strongly the target stands out after allowing for texture and noise. | 0 to no fixed maximum; 0 means no median-brightness difference. | Usually. Higher means clearer separation relative to texture and noise, but there is no universal pass mark. |
+| Weber Contrast | `(target median − local median) ÷ local median`. It shows how much brighter or darker the target is relative to its nearby background. | −1 to no fixed positive maximum; 0 is equal brightness, −1 is a black target, and +1 is a target twice as bright. | Distance from 0 matters, not simply higher. The sign means darker (−) or brighter (+). |
+| Target Dynamic Range | `log₂(bright-background median ÷ target median)`. It counts brightness doublings between the bright reference and target. | No fixed range; 0 stops is equal, +1 is 2× brighter, +2 is 4× brighter, and −1 means the target is 2× brighter. | No. A large positive value describes a demanding bright-background scene; it is not a quality score. |
+| Target Signal-to-Noise Ratio | Target median brightness divided by robust variation inside the target. Sensor noise and real surface texture both contribute. | 0 to no fixed maximum; a nearly uniform target can produce a very large value. | Higher usually means cleaner or more uniform, but not necessarily more visible. |
+| Bright-Background Clipping | Bright-reference pixels at or above 99% of normalized linear brightness, divided by all pixels in that region. | 0% to 100%. | No. Lower is better because clipped highlights no longer preserve their original brightness detail. |
+| Target Shadows Below 1% | Target pixels below 1% of normalized linear brightness, divided by all target pixels. | 0% to 100%. | No. Lower is usually better; a high value places much of the target near the camera's shadow floor. |
+| Local-Background Dynamic Range | `log₂(bright-background median ÷ local-background median)`. It counts brightness doublings between the two background references. | No fixed range; 0 stops is equal, +1 is 2× brighter, and +2 is 4× brighter. | No. This is lighting context, not a score. |
+| Michelson Contrast | `(target median − local median) ÷ (target median + local median)`. It compares darker and brighter targets symmetrically. | −1 to +1; 0 means equal brightness. | Distance from 0 matters. The sign means darker (−) or brighter (+). |
 
 Validity warnings are shown separately from the measurements. There are deliberately no universal
 pass/fail thresholds: acceptable visibility depends on the scene, display, task, and observer.

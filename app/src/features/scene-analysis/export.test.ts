@@ -20,6 +20,11 @@ describe("comparison report", () => {
     expect(html).toContain("data:image/jpeg;base64,abc123");
     expect(html).toContain("data:image/jpeg;base64,xyz789");
     expect(html).toContain("Robust Contrast-to-Noise Ratio");
+    expect(html).toContain("How to Read the Measurements");
+    expect(html).toContain("What Is a Stop?");
+    expect(html).toContain("How It Is Calculated");
+    expect(html).toContain("Value Range");
+    expect(html).toContain("Is Higher Better?");
     expect(html).toContain("Camera Settings");
     expect(html).toContain("1/125 s");
     expect(html).toContain("Sensitive source fields and original filenames are excluded.");
