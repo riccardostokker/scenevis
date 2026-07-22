@@ -9,7 +9,7 @@ from scenevis.analysis.metrics import primary_metrics, statistics
 from scenevis.analysis.model import Metrics, Options, RegionStatistics, Result
 from scenevis.error import ScenevisError
 from scenevis.scene.load import load
-from scenevis.scene.model import BoolMask, Loaded
+from scenevis.scene.model import BoolMask, ImageMetadata, Loaded
 from scenevis.scene.regions import Regions, masks, overlap_fraction
 
 
@@ -103,7 +103,7 @@ def _warnings(
     stats: Mapping[str, RegionStatistics],
     metrics: Metrics,
     processing_source: str,
-    metadata: Mapping[str, object],
+    metadata: ImageMetadata,
     options: Options,
 ) -> list[str]:
     warnings: list[str] = []
@@ -140,6 +140,6 @@ def _warnings(
     if processing_source != "raw":
         input_type = Path(image_name).suffix.lower().removeprefix(".").upper()
         warnings.append(f"{input_type} is rendered input; RAW is preferred")
-    if "exposure_time_s" not in metadata or "iso" not in metadata:
+    if metadata.summary.exposure_time_seconds is None or metadata.summary.iso is None:
         warnings.append("Exposure metadata is incomplete")
     return warnings

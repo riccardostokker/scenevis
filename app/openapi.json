@@ -46,6 +46,195 @@
         "title": "Body_createPreview",
         "type": "object"
       },
+      "CaptureMetadata": {
+        "description": "Normalized photographic context used to compare scene captures.",
+        "properties": {
+          "aperture_f_number": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aperture F Number"
+          },
+          "camera_make": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Camera Make"
+          },
+          "camera_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Camera Model"
+          },
+          "captured_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captured At"
+          },
+          "color_space": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Space"
+          },
+          "exposure_compensation_ev": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exposure Compensation Ev"
+          },
+          "exposure_time_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exposure Time Seconds"
+          },
+          "exposure_value_ev100": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exposure Value Ev100"
+          },
+          "file_format": {
+            "title": "File Format",
+            "type": "string"
+          },
+          "file_size_bytes": {
+            "title": "File Size Bytes",
+            "type": "integer"
+          },
+          "focal_length_35mm_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focal Length 35Mm Mm"
+          },
+          "focal_length_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Focal Length Mm"
+          },
+          "height_px": {
+            "title": "Height Px",
+            "type": "integer"
+          },
+          "iso": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iso"
+          },
+          "lens": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lens"
+          },
+          "metering_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metering Mode"
+          },
+          "orientation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orientation"
+          },
+          "white_balance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "White Balance"
+          },
+          "width_px": {
+            "title": "Width Px",
+            "type": "integer"
+          }
+        },
+        "required": ["file_format", "file_size_bytes", "width_px", "height_px"],
+        "title": "CaptureMetadata",
+        "type": "object"
+      },
       "Health": {
         "description": "Service readiness response.",
         "properties": {
@@ -59,24 +248,71 @@
         "title": "Health",
         "type": "object"
       },
-      "MetadataValue": {
-        "anyOf": [
-          {
-            "type": "string"
+      "ImageMetadata": {
+        "description": "Normalized comparison fields plus namespaced source metadata.",
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/MetadataEntry"
+            },
+            "title": "Entries",
+            "type": "array"
           },
-          {
-            "type": "integer"
-          },
-          {
-            "type": "number"
-          },
-          {
+          "entries_truncated": {
+            "default": false,
+            "title": "Entries Truncated",
             "type": "boolean"
           },
-          {
-            "type": "null"
+          "summary": {
+            "$ref": "#/components/schemas/CaptureMetadata"
+          },
+          "version": {
+            "const": 1,
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
           }
-        ]
+        },
+        "required": ["summary", "entries"],
+        "title": "ImageMetadata",
+        "type": "object"
+      },
+      "MetadataEntry": {
+        "description": "One bounded, display-safe metadata entry from the source image.",
+        "properties": {
+          "group": {
+            "$ref": "#/components/schemas/MetadataGroup"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "sensitive": {
+            "default": false,
+            "title": "Sensitive",
+            "type": "boolean"
+          },
+          "truncated": {
+            "default": false,
+            "title": "Truncated",
+            "type": "boolean"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": ["key", "label", "group", "value"],
+        "title": "MetadataEntry",
+        "type": "object"
+      },
+      "MetadataGroup": {
+        "enum": ["file", "image", "exif", "gps", "camera", "thumbnail", "xmp", "other"],
+        "type": "string"
       },
       "Metrics": {
         "description": "Primary transparent scene-visibility KPIs.",
@@ -260,11 +496,7 @@
             "type": "string"
           },
           "metadata": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/MetadataValue"
-            },
-            "title": "Metadata",
-            "type": "object"
+            "$ref": "#/components/schemas/ImageMetadata"
           },
           "preview_data_url": {
             "title": "Preview Data Url",
@@ -274,8 +506,8 @@
             "$ref": "#/components/schemas/Processing"
           },
           "version": {
-            "const": 1,
-            "default": 1,
+            "const": 2,
+            "default": 2,
             "title": "Version",
             "type": "integer"
           },
@@ -545,11 +777,7 @@
             "type": "string"
           },
           "metadata": {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/MetadataValue"
-            },
-            "title": "Metadata",
-            "type": "object"
+            "$ref": "#/components/schemas/ImageMetadata"
           },
           "metrics": {
             "$ref": "#/components/schemas/Metrics"
@@ -574,7 +802,7 @@
             "type": "string"
           },
           "version": {
-            "default": 1,
+            "default": 2,
             "title": "Version",
             "type": "integer"
           },

@@ -98,6 +98,50 @@ export interface components {
             image: string;
         };
         /**
+         * CaptureMetadata
+         * @description Normalized photographic context used to compare scene captures.
+         */
+        CaptureMetadata: {
+            /** Aperture F Number */
+            aperture_f_number?: number | null;
+            /** Camera Make */
+            camera_make?: string | null;
+            /** Camera Model */
+            camera_model?: string | null;
+            /** Captured At */
+            captured_at?: string | null;
+            /** Color Space */
+            color_space?: string | null;
+            /** Exposure Compensation Ev */
+            exposure_compensation_ev?: number | null;
+            /** Exposure Time Seconds */
+            exposure_time_seconds?: number | null;
+            /** Exposure Value Ev100 */
+            exposure_value_ev100?: number | null;
+            /** File Format */
+            file_format: string;
+            /** File Size Bytes */
+            file_size_bytes: number;
+            /** Focal Length 35Mm Mm */
+            focal_length_35mm_mm?: number | null;
+            /** Focal Length Mm */
+            focal_length_mm?: number | null;
+            /** Height Px */
+            height_px: number;
+            /** Iso */
+            iso?: number | null;
+            /** Lens */
+            lens?: string | null;
+            /** Metering Mode */
+            metering_mode?: string | null;
+            /** Orientation */
+            orientation?: string | null;
+            /** White Balance */
+            white_balance?: string | null;
+            /** Width Px */
+            width_px: number;
+        };
+        /**
          * Health
          * @description Service readiness response.
          */
@@ -109,7 +153,51 @@ export interface components {
              */
             status: "ok";
         };
-        MetadataValue: string | number | boolean | null;
+        /**
+         * ImageMetadata
+         * @description Normalized comparison fields plus namespaced source metadata.
+         */
+        ImageMetadata: {
+            /** Entries */
+            entries: components["schemas"]["MetadataEntry"][];
+            /**
+             * Entries Truncated
+             * @default false
+             */
+            entries_truncated: boolean;
+            summary: components["schemas"]["CaptureMetadata"];
+            /**
+             * Version
+             * @default 1
+             * @constant
+             */
+            version: 1;
+        };
+        /**
+         * MetadataEntry
+         * @description One bounded, display-safe metadata entry from the source image.
+         */
+        MetadataEntry: {
+            group: components["schemas"]["MetadataGroup"];
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /**
+             * Sensitive
+             * @default false
+             */
+            sensitive: boolean;
+            /**
+             * Truncated
+             * @default false
+             */
+            truncated: boolean;
+            /** Value */
+            value: string;
+        };
+        /** @enum {string} */
+        MetadataGroup: "file" | "image" | "exif" | "gps" | "camera" | "thumbnail" | "xmp" | "other";
         /**
          * Metrics
          * @description Primary transparent scene-visibility KPIs.
@@ -191,19 +279,16 @@ export interface components {
             height_px: number;
             /** Image */
             image: string;
-            /** Metadata */
-            metadata: {
-                [key: string]: components["schemas"]["MetadataValue"];
-            };
+            metadata: components["schemas"]["ImageMetadata"];
             /** Preview Data Url */
             preview_data_url: string;
             processing: components["schemas"]["Processing"];
             /**
              * Version
-             * @default 1
+             * @default 2
              * @constant
              */
-            version: 1;
+            version: 2;
             /** Width Px */
             width_px: number;
         };
@@ -316,10 +401,7 @@ export interface components {
         Result: {
             /** Image */
             image: string;
-            /** Metadata */
-            metadata: {
-                [key: string]: components["schemas"]["MetadataValue"];
-            };
+            metadata: components["schemas"]["ImageMetadata"];
             metrics: components["schemas"]["Metrics"];
             /**
              * Preview Notice
@@ -335,7 +417,7 @@ export interface components {
             scene_id: string;
             /**
              * Version
-             * @default 1
+             * @default 2
              */
             version: number;
             /** Warnings */

@@ -1,30 +1,23 @@
 from __future__ import annotations
 
-from numbers import Real
 from pathlib import Path
 
 import numpy as np
-from PIL import ExifTags, Image, ImageOps
+from PIL import Image, ImageOps
 
-from scenevis.scene.model import Loaded, MetadataValue, Processing
+from scenevis.scene.metadata import read as read_metadata
+from scenevis.scene.model import Loaded, Processing
 
 
 def load(path: Path) -> Loaded:
     """Load an ordinary raster and approximately linearize its sRGB values."""
 
     with Image.open(path) as source:
-        metadata = _metadata(source)
         preview = ImageOps.exif_transpose(source).convert("RGB")
 
     encoded = np.asarray(preview, dtype=np.float32) / np.float32(255.0)
     linear = _inverse_srgb(encoded)
-    metadata.update(
-        {
-            "file_type": path.suffix.lower().removeprefix("."),
-            "width_px": preview.width,
-            "height_px": preview.height,
-        }
-    )
+    metadata = read_metadata(path, width_px=preview.width, height_px=preview.height)
     processing = Processing(
         source="raster",
         linear=True,
@@ -45,34 +38,3 @@ def _inverse_srgb(encoded: np.ndarray) -> np.ndarray:
         encoded / 12.92,
         np.power((encoded + 0.055) / 1.055, 2.4),
     ).astype(np.float32)
-
-
-def _metadata(image: Image.Image) -> dict[str, MetadataValue]:
-    wanted = {
-        "Model": "camera_model",
-        "LensModel": "lens",
-        "FocalLength": "focal_length_mm",
-        "FNumber": "aperture",
-        "ExposureTime": "exposure_time_s",
-        "ISOSpeedRatings": "iso",
-        "PhotographicSensitivity": "iso",
-        "DateTimeOriginal": "captured_at",
-        "ExposureBiasValue": "exposure_compensation_ev",
-        "MeteringMode": "metering_mode",
-        "WhiteBalance": "white_balance",
-    }
-    result: dict[str, MetadataValue] = {}
-    for identifier, value in image.getexif().items():
-        name = ExifTags.TAGS.get(identifier)
-        field = wanted.get(name or "")
-        if field is not None:
-            result[field] = _plain(value)
-    return result
-
-
-def _plain(value: object) -> MetadataValue:
-    if isinstance(value, str | int | float | bool) or value is None:
-        return value
-    if isinstance(value, Real):
-        return float(value)
-    return str(value)

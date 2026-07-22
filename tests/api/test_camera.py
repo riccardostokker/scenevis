@@ -48,6 +48,13 @@ def test_analysis(name: str) -> None:
     assert result["result"]["processing"]["source"] == "raw"
     assert result["result"]["processing"]["black_level_per_channel"] is not None
     assert math.isfinite(result["result"]["metrics"]["dr_target_median_stops"])
+    metadata = result["result"]["metadata"]
+    assert metadata["summary"]["file_format"] == "cr2"
+    assert metadata["summary"]["camera_model"]
+    assert metadata["summary"]["aperture_f_number"]
+    assert metadata["summary"]["exposure_time_seconds"]
+    assert metadata["summary"]["iso"]
+    assert len(metadata["entries"]) > 20
 
 
 def _regions_json(name: str) -> str:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from scenevis.scene.model import MetadataValue, Processing
+from scenevis.scene.model import ImageMetadata, Processing
 
 
 class Options(BaseModel):
@@ -80,10 +80,10 @@ class Result(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    version: int = 1
+    version: int = 2
     scene_id: str
     image: str
-    metadata: dict[str, MetadataValue]
+    metadata: ImageMetadata
     processing: Processing
     region_statistics: dict[str, RegionStatistics]
     metrics: Metrics

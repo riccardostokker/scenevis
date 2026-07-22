@@ -24,6 +24,10 @@ def test_preview_and_analysis() -> None:
     assert preview["preview_data_url"].startswith("data:image/jpeg;base64,")
     assert preview["width_px"] == 120
     assert preview["height_px"] == 100
+    assert preview["version"] == 2
+    assert preview["metadata"]["summary"]["file_format"] == "png"
+    assert preview["metadata"]["summary"]["width_px"] == 120
+    assert preview["metadata"]["entries"] == []
 
     analysis_response = asyncio.run(
         _post(
@@ -37,6 +41,8 @@ def test_preview_and_analysis() -> None:
     assert analysis_response.status_code == 200
     assert analysis["result"]["scene_id"] == "scene"
     assert analysis["result"]["image"] == "scene.png"
+    assert analysis["result"]["version"] == 2
+    assert analysis["result"]["metadata"]["summary"]["file_format"] == "png"
     assert analysis["result"]["metrics"]["cnr_robust"] > 0
     assert analysis["regions"] == _regions().model_dump(mode="json")
 

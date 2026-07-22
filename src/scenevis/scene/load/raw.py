@@ -6,7 +6,9 @@ import numpy as np
 import rawpy
 from PIL import Image
 
-from scenevis.scene.model import Loaded, MetadataValue, Processing
+from scenevis.scene.metadata import MetadataFallback
+from scenevis.scene.metadata import read as read_metadata
+from scenevis.scene.model import Loaded, Processing
 
 
 def load(path: Path) -> Loaded:
@@ -29,7 +31,21 @@ def load(path: Path) -> Loaded:
         black_levels = [int(value) for value in raw.black_level_per_channel]
         white_level = int(raw.white_level)
         white_balance = [float(value) for value in (raw.auto_whitebalance or [])]
-        metadata = _metadata(raw, path=path, width=rgb.shape[1], height=rgb.shape[0])
+        other = raw.other
+        lens = raw.lens
+        metadata = read_metadata(
+            path,
+            width_px=rgb.shape[1],
+            height_px=rgb.shape[0],
+            fallback=MetadataFallback(
+                lens=str(lens) if lens is not None else None,
+                aperture_f_number=_number(other.aperture),
+                exposure_time_seconds=_number(other.shutter_speed),
+                iso=_integer(other.iso_speed),
+                focal_length_mm=_number(other.focal_length),
+                captured_at=str(other.timestamp) if other.timestamp is not None else None,
+            ),
+        )
 
     processing = Processing(
         source="raw",
@@ -63,21 +79,9 @@ def _preview(linear: np.ndarray) -> Image.Image:
     return Image.fromarray(np.asarray(np.rint(encoded * 255.0), dtype=np.uint8), mode="RGB")
 
 
-def _metadata(raw: rawpy.RawPy, *, path: Path, width: int, height: int) -> dict[str, MetadataValue]:
-    other = raw.other
-    lens = raw.lens
-    return {
-        "file_type": path.suffix.lower().removeprefix("."),
-        "width_px": width,
-        "height_px": height,
-        "iso": _number(other.iso_speed),
-        "exposure_time_s": _number(other.shutter_speed),
-        "aperture": _number(other.aperture),
-        "focal_length_mm": _number(other.focal_length),
-        "captured_at": str(other.timestamp) if other.timestamp is not None else None,
-        "lens": str(lens) if lens is not None else None,
-    }
-
-
 def _number(value: object) -> float | None:
     return float(value) if isinstance(value, int | float) else None
+
+
+def _integer(value: object) -> int | None:
+    return round(value) if isinstance(value, int | float) else None
