@@ -5,7 +5,7 @@ import { buildReport } from "./export";
 import type { CompletedScenario } from "./scenarios";
 
 describe("comparison report", () => {
-  it("embeds named scenario frames, comparison KPIs, zones, and no scripts", () => {
+  it("embeds named scenario frames, comparison KPIs, zones, and self-contained controls", () => {
     const scenarios = [
       reportScenario("North Atrium", "atrium.jpg", "abc123", 3.4),
       reportScenario("Platform <West>", "platform.jpg", "xyz789", 5.2),
@@ -26,6 +26,11 @@ describe("comparison report", () => {
     expect(html).toContain("Value Range");
     expect(html).toContain("Is Higher Better?");
     expect(html).toContain("Camera Settings");
+    expect(html).toContain("Filter by Camera Settings");
+    expect(html).toContain('data-filter="aperture"');
+    expect(html).toContain('data-sort-key="capture:aperture"');
+    expect(html).toContain('data-sort-key="metric:cnr_robust"');
+    expect(html).toContain("Content-Security-Policy");
     expect(html).toContain("1/125 s");
     expect(html).toContain("Sensitive source fields and original filenames are excluded.");
     expect(html).not.toContain("CAMERA-123");
@@ -35,7 +40,9 @@ describe("comparison report", () => {
     expect(html).toContain('stroke-linejoin="round"');
     expect(html).toContain('vector-effect="non-scaling-stroke"');
     expect(html).not.toContain("<text");
-    expect(html).not.toContain("<script");
+    expect(html).toContain("<script>");
+    expect(html).not.toContain("innerHTML");
+    expect(html).not.toContain("fetch(");
   });
 
   it("includes sensitive metadata only when requested", () => {
@@ -47,6 +54,16 @@ describe("comparison report", () => {
     expect(html).toContain("CAMERA-123");
     expect(html).toContain("2026-07-21 18:42:00");
     expect(html).toContain("Sensitive source fields are included in this artifact.");
+  });
+
+  it("escapes metadata used by report filters", () => {
+    const scenario = reportScenario("North Atrium", "atrium.jpg", "abc123", 3.4);
+    scenario.preview.metadata.summary.camera_model = 'EOS"><img src=x onerror=alert(1)>';
+
+    const html = buildReport([scenario]);
+
+    expect(html).not.toContain("<img src=x onerror=alert(1)>");
+    expect(html).toContain("EOS&quot;&gt;&lt;img src=x onerror=alert(1)&gt;");
   });
 });
 

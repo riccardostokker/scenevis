@@ -27,6 +27,9 @@ describe("capture metadata", () => {
     expect(values.iso).toBe("400");
     expect(values.focalLength).toBe("50 mm · 80 mm eq.");
     expect(values.exposureValue).toBe("9.9 EV100");
+    expect(
+      CAPTURE_COMPARISON_FIELDS.find((field) => field.key === "shutter")?.numericValue?.(capture),
+    ).toBe(1 / 125);
   });
 
   it("identifies capture settings that differ", () => {

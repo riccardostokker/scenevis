@@ -78,7 +78,30 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(measurementTable.getByRole("cell", { name: "North Approach" })).toBeVisible();
   await expect(measurementTable.getByRole("cell", { name: "South Platform" })).toBeVisible();
   await expect(page.getByText("2 of 2 scenarios analyzed")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Camera Settings" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Camera Settings", exact: true })).toBeVisible();
+  const focalLengthFilter = page.getByRole("combobox", { name: "Focal Length Filter" });
+  await focalLengthFilter.click();
+  await page.getByRole("option", { name: "48 mm", exact: true }).click();
+  await expect(page.getByText("Showing 1 of 2")).toBeVisible();
+  await expect(measurementTable.getByRole("cell", { name: "North Approach" })).toBeVisible();
+  await expect(measurementTable.getByRole("cell", { name: "South Platform" })).not.toBeVisible();
+  await page.getByRole("button", { name: "Reset View" }).click();
+
+  const contrastSort = measurementTable.locator(
+    'button[aria-label^="Sort by Robust Contrast-to-Noise Ratio"]',
+  );
+  await contrastSort.click();
+  await contrastSort.click();
+  await expect(measurementTable.locator('th[aria-sort="descending"]')).toContainText(
+    "Robust Contrast-to-Noise Ratio",
+  );
+  await expect(measurementTable.locator("tbody tr").first()).toContainText("South Platform");
+  expect(await page.locator(".comparison-card h2").allTextContents()).toEqual([
+    "South Platform",
+    "North Approach",
+  ]);
+  await page.getByRole("button", { name: "Reset View" }).click();
+
   await expect(page.getByText("How to Read the Measurements")).toBeVisible();
   await page.getByText("How to Read the Measurements").click();
   await expect(page.getByText("What Is a Stop?")).toBeVisible();
@@ -110,11 +133,12 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   expect(html).toContain("What Is a Stop?");
   expect(html).toContain("Is Higher Better?");
   expect(html).toContain("Camera Settings");
+  expect(html).toContain("Filter by Camera Settings");
   expect(html).toContain("Sensitive source fields and original filenames are excluded.");
   expect(html).not.toContain("IMG_0085.JPG");
   expect(html).toContain('data-zone="target"');
   expect(html).not.toContain("<text");
-  expect(html).not.toContain("<script");
+  expect(html).toContain("<script>");
 
   const reportPage = await page.context().newPage();
   await reportPage.goto(pathToFileURL(output).href);
@@ -122,20 +146,51 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(reportPage.getByRole("heading", { name: "North Approach" })).toBeVisible();
   await expect(reportPage.getByRole("heading", { name: "South Platform" })).toBeVisible();
   await expect(reportPage.getByRole("heading", { name: "What Is a Stop?" })).toBeVisible();
+  const reportFocalLength = reportPage.getByRole("combobox", { name: "Focal Length Filter" });
+  await reportFocalLength.selectOption({ label: "48 mm" });
+  await expect(reportPage.getByText("Showing 1 of 2")).toBeVisible();
+  await expect(reportPage.getByRole("heading", { name: "North Approach" })).toBeVisible();
+  await expect(reportPage.getByRole("heading", { name: "South Platform" })).not.toBeVisible();
+  await reportPage.getByRole("button", { name: "Reset View" }).click();
+
+  const reportContrastSort = reportPage.getByRole("button", {
+    name: "Sort by Robust Contrast-to-Noise Ratio",
+  });
+  await reportContrastSort.click();
+  await reportContrastSort.click();
+  await expect(reportPage.locator('th[aria-sort="descending"]')).toContainText(
+    "Robust Contrast-to-Noise Ratio",
+  );
+  await expect(reportPage.locator(".scenario").first()).toContainText("South Platform");
   expect(await reportPage.locator(".scenario").count()).toBe(2);
   expect(await reportPage.locator("svg text").count()).toBe(0);
   await reportPage.screenshot({
     path: test.info().outputPath("comparison-report.png"),
     fullPage: true,
   });
+  await reportPage.setViewportSize({ width: 390, height: 844 });
+  await expect(reportPage.getByRole("combobox", { name: "Aperture Filter" })).toBeVisible();
+  expect(
+    await reportPage.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    ),
+  ).toBe(false);
   await reportPage.close();
 
   expect(consoleErrors).toEqual([]);
   expect(requestFailures).toEqual([]);
   await page.screenshot({ path: test.info().outputPath("comparison.png"), fullPage: true });
 
-  await page.getByRole("tab", { name: "Annotate" }).click();
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("combobox", { name: "Aperture Filter" })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    ),
+  ).toBe(false);
+  await page.screenshot({ path: test.info().outputPath("comparison-narrow.png"), fullPage: true });
+
+  await page.getByRole("tab", { name: "Annotate" }).click();
   await expect(page.locator(".selection-toolbar")).toBeVisible();
   await expect(page.getByRole("button", { name: "Lasso", exact: true })).toBeVisible();
   const hasHorizontalOverflow = await page.evaluate(

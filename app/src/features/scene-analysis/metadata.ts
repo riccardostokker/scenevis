@@ -21,6 +21,7 @@ export type MetadataField = {
   description: string;
   sensitive?: boolean;
   value: (metadata: CaptureMetadata) => string | null;
+  numericValue?: (metadata: CaptureMetadata) => number | null;
 };
 
 export const CAPTURE_DETAIL_FIELDS: readonly MetadataField[] = [
@@ -29,36 +30,42 @@ export const CAPTURE_DETAIL_FIELDS: readonly MetadataField[] = [
     title: "Shutter Speed",
     description: "Exposure duration reported by the camera.",
     value: (metadata) => shutter(metadata.exposure_time_seconds),
+    numericValue: (metadata) => finite(metadata.exposure_time_seconds),
   },
   {
     key: "aperture",
     title: "Aperture",
     description: "Lens opening used for the capture.",
     value: (metadata) => number(metadata.aperture_f_number, "f/"),
+    numericValue: (metadata) => finite(metadata.aperture_f_number),
   },
   {
     key: "iso",
     title: "ISO",
     description: "Camera sensitivity setting reported for the capture.",
     value: (metadata) => integer(metadata.iso),
+    numericValue: (metadata) => finite(metadata.iso),
   },
   {
     key: "focalLength",
     title: "Focal Length",
     description: "Actual lens focal length, with 35 mm equivalent when available.",
     value: (metadata) => focalLength(metadata),
+    numericValue: (metadata) => finite(metadata.focal_length_mm),
   },
   {
     key: "exposureValue",
     title: "Exposure Value",
     description: "EV100 derived from aperture and shutter speed.",
     value: (metadata) => number(metadata.exposure_value_ev100, "", " EV100", 1),
+    numericValue: (metadata) => finite(metadata.exposure_value_ev100),
   },
   {
     key: "exposureCompensation",
     title: "Exposure Compensation",
     description: "Camera exposure adjustment relative to its metered value.",
     value: (metadata) => signed(metadata.exposure_compensation_ev, " EV"),
+    numericValue: (metadata) => finite(metadata.exposure_compensation_ev),
   },
   {
     key: "camera",
@@ -191,6 +198,10 @@ function signed(value: number | null | undefined, suffix: string): string | null
 
 function trim(value: number, digits: number): string {
   return value.toFixed(digits).replace(/\.?0+$/, "");
+}
+
+function finite(value: number | null | undefined): number | null {
+  return value !== null && value !== undefined && Number.isFinite(value) ? value : null;
 }
 
 function fileSize(bytes: number): string {

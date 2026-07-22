@@ -101,6 +101,10 @@ bright reference is brighter than the region being compared; a negative result m
 | Local-Background Dynamic Range | `log₂(bright-background median ÷ local-background median)`. It counts brightness doublings between the two background references. | No fixed range; 0 stops is equal, +1 is 2× brighter, and +2 is 4× brighter. | No. This is lighting context, not a score. |
 | Michelson Contrast | `(target median − local median) ÷ (target median + local median)`. It compares darker and brighter targets symmetrically. | −1 to +1; 0 means equal brightness. | Distance from 0 matters. The sign means darker (−) or brighter (+). |
 
+The live comparison view can filter scenarios by exact reported aperture, shutter speed, ISO,
+focal length, exposure value, or camera. Every numerical table heading is sortable; the selected
+order also controls the scenario frames, while missing metadata remains at the end.
+
 Validity warnings are shown separately from the measurements. There are deliberately no universal
 pass/fail thresholds: acceptable visibility depends on the scene, display, task, and observer.
 
@@ -109,8 +113,10 @@ pass/fail thresholds: acceptable visibility depends on the scene, display, task,
 The exported HTML report embeds a compressed display preview and validated zones for every
 completed scenario. It also contains an aligned comparison table, ordered KPI values, their
 plain-language descriptions, camera-setting comparisons, source metadata, and measurement
-warnings. The artifact has no external assets or executable scripts, so it can be opened and
-shared as a single file.
+warnings. Camera-setting filters and sortable numerical columns update both tables and the image
+frames without discarding any scenario data. The artifact has no external assets or network
+access; its small inline controller is constrained by a content-security policy, so it can be
+opened and shared as a single file.
 
 Metadata is reported by the source image and remains contextual; it never becomes a visibility
 measurement input. GPS fields, camera and lens serial numbers, ownership fields, exact capture
