@@ -4,15 +4,19 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 test("builds and exports a multi-location visibility study", async ({ page }) => {
+  test.setTimeout(90_000);
+
   const consoleErrors: string[] = [];
   const requestFailures: string[] = [];
   const previewResponses: number[] = [];
+  const analysisResponses: number[] = [];
   page.on("console", (entry) => {
     if (entry.type() === "error") consoleErrors.push(entry.text());
   });
   page.on("requestfailed", (request) => requestFailures.push(request.url()));
   page.on("response", (response) => {
     if (response.url().endsWith("/api/previews")) previewResponses.push(response.status());
+    if (response.url().endsWith("/api/analyses")) analysisResponses.push(response.status());
   });
   await page.goto("/");
 
@@ -73,6 +77,7 @@ test("builds and exports a multi-location visibility study", async ({ page }) =>
   await expect(analyzeAll).toBeEnabled();
   await analyzeAll.click();
 
+  await expect.poll(() => analysisResponses, { timeout: 60_000 }).toEqual([200, 200]);
   await expect(page.getByRole("heading", { name: "Location Study" })).toBeVisible();
   const measurementTable = page.getByLabel("Key Measurements");
   const qualityTable = page.getByLabel("Focus and Detail");
